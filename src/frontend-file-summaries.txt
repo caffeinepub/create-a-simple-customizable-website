@@ -1,0 +1,16 @@
+{
+  "frontend/src/App.tsx": "Main application component that orchestrates the website layout, authentication flow, profile setup modal, and admin editor dialog with proper loading states.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including fetching/updating website content, user profiles, and admin role checks with proper cache invalidation.",
+  "frontend/src/hooks/useAdminAccess.ts": "Custom hook that combines Internet Identity authentication state with backend admin role checks to determine editor access permissions.",
+  "frontend/src/components/navigation/HeaderNav.tsx": "Responsive header navigation with mobile menu, smooth scroll navigation, login button, and conditional admin edit button.",
+  "frontend/src/components/sections/HeroSection.tsx": "Hero section component displaying title, body text, and the generated hero illustration image with responsive layout.",
+  "frontend/src/components/sections/ContentSections.tsx": "Main content section with title, description, and three feature cards showcasing key benefits.",
+  "frontend/src/components/sections/Footer.tsx": "Footer component with customizable text, caffeine.ai attribution with UTM tracking, and copyright notice.",
+  "frontend/src/components/auth/LoginButton.tsx": "Internet Identity login/logout button with proper state management and query cache clearing on logout.",
+  "frontend/src/components/auth/ProfileSetupModal.tsx": "Modal dialog that prompts new users to enter their name on first login, preventing UI flash with proper loading states.",
+  "frontend/src/components/admin/AdminEditor.tsx": "Full-featured admin editor dialog with form fields for all website content, access control, error handling, and success notifications.",
+  "frontend/src/components/admin/AccessDeniedScreen.tsx": "Access denied message component shown to unauthorized users attempting to access the admin editor.",
+  "frontend/src/index.css": "Global styles with warm amber/orange OKLCH color palette for light and dark modes, avoiding blue/purple themes.",
+  "frontend/tailwind.config.js": "Tailwind configuration with Inter font family, enhanced shadow utilities, and warm color theme extensions.",
+  "frontend/index.html": "HTML entry point with favicon reference, SEO meta tags, and proper page title."
+}

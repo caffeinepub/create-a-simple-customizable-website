@@ -1,0 +1,37 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-15T06:51:24.133Z",
+  "summary": "REQ-6 (default site title on fresh/uninitialized state) appears implemented by setting the backend default `websiteContent.siteTitle` to \"welcome to waxy\". However, the diff introduces a separate Motoko module for migration (violating the constraint to keep Motoko logic in `backend/main.mo`) and also forces defaults for other content fields (hero/main/footer) beyond the requested site title change.",
+  "missing_requirements": [],
+  "hallucinated_features": [
+    {
+      "description": "Introduced a separate Motoko migration module and wired it into the actor via `(with migration = Migration.run)`, adding Motoko logic outside the single main actor file.",
+      "reason": "BuildRequest constraint: \"Keep all Motoko logic in the single main actor (backend/main.mo).\" The diff adds `backend/migration.mo` and imports/uses it from `backend/main.mo`.",
+      "evidence": [
+        "backend/migration.mo",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Migration logic overwrites the entire `websiteContent` (heroSection, mainSection, footerText) rather than only updating the default site title.",
+      "reason": "Only the site title default update was requested (REQ-6). The migration sets hero/main/footer text as well, which is not requested and may violate the non-goal about not changing those texts unless explicitly requested.",
+      "evidence": [
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "description": "Backend default `websiteContent` includes explicit hero/main/footer text values (not just the site title).",
+      "reason": "REQ-6 only asks to update the default persisted site title; changing or re-specifying other user-facing copy was not requested and may conflict with the non-goal of not changing hero/main/footer text unless requested.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "project_state.json"
+  ]
+}

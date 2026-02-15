@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "Build a simple customizable internet-facing website.",
+  "architectural_notes": [],
+  "known_issues": [
+    "User reports they cannot see the live website (possibly blank page/loading/error)."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-implement-a-public-website-frontend-with-a-responsive-landing-page-that-includes-at-least-a-header-with-site-name-and-navigation-a-hero-section-2-4-content-sections-and-a-footer-all-user-facing-text-must-be-in-english",
+      "title": "Implement a public website frontend with a responsive landing page that includes at least: a header with site name and navigation, a hero section, 2–4 content sections, and a footer. All user-facing text must be in English.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-coherent-distinct-visual-theme-colors-typography-spacing-and-component-styling-and-apply-it-consistently-across-the-website-do-not-use-a-blue-purple-theme",
+      "title": "Add a coherent, distinct visual theme (colors, typography, spacing, and component styling) and apply it consistently across the website. Do not use a blue/purple theme.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-admin-editing-ui-that-allows-an-authenticated-user-internet-identity-to-edit-the-site-content-fields-and-save-changes-to-the-backend-while-unauthenticated-visitors-can-only-view-the-public-site",
+      "title": "Add an admin editing UI that allows an authenticated user (Internet Identity) to edit the site content fields and save changes to the backend, while unauthenticated visitors can only view the public site.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-render-required-generated-images-as-static-assets-served-from-the-frontend-frontend-public-assets-generated-and-use-them-in-the-website-ui-e-g-hero-graphic-and-favicon-app-icon",
+      "title": "Render required generated images as static assets served from the frontend (frontend/public/assets/generated) and use them in the website UI (e.g., hero graphic and favicon/app icon).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create a simple internet-facing website that can be customized.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Make the website content customizable by storing editable site content in the backend (e.g., site title, hero headline/subheadline, section titles/body, footer text) and exposing query + update methods. Updates must persist across page reloads.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Update the default persisted website content so the site title text is exactly \"welcome to waxy\" (matching the user request) when the canister is freshly deployed or state is otherwise uninitialized.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Create a simple customizable website",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

@@ -1,0 +1,40 @@
+{
+  "kind": "build_request",
+  "title": "Update default site title to \"welcome to waxy\"",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-6",
+      "text": "Update the default persisted website content so the site title text is exactly \"welcome to waxy\" (matching the user request) when the canister is freshly deployed or state is otherwise uninitialized.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-5",
+          "msg-7"
+        ],
+        "quotes": [
+          "Change the title welcome to waxy",
+          "Change"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On a fresh deploy (no prior saved content), calling getWebsiteContent returns siteTitle == \"welcome to waxy\".",
+        "The header displays \"welcome to waxy\" as the site title for unauthenticated visitors, without requiring any admin edits."
+      ]
+    }
+  ],
+  "constraints": [
+    "Keep all Motoko logic in the single main actor (backend/main.mo).",
+    "Do not edit any frontend files under frontend/src/components/ui or other immutablePaths listed in SYSTEM_CONTEXT.",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Do not redesign the site layout or visual theme.",
+    "Do not change hero section, main section, footer text, or navigation labels unless explicitly requested.",
+    "Do not add new authentication methods beyond Internet Identity."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
