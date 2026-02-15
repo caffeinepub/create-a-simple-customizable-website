@@ -1,40 +1,85 @@
 {
   "kind": "build_request",
-  "title": "Update default site title to \"welcome to waxy\"",
-  "priority": "normal",
+  "title": "Remove admin-only restriction so anyone can edit site content",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-6",
-      "text": "Update the default persisted website content so the site title text is exactly \"welcome to waxy\" (matching the user request) when the canister is freshly deployed or state is otherwise uninitialized.",
+      "id": "REQ-1",
+      "text": "Update the backend so updating website content is no longer restricted to administrators (any caller, including anonymous, can call updateWebsiteContent successfully).",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5",
-          "msg-7"
+          "msg-5"
         ],
         "quotes": [
-          "Change the title welcome to waxy",
-          "Change"
+          "Its now saying only admins can editt"
         ]
       },
       "acceptanceCriteria": [
-        "On a fresh deploy (no prior saved content), calling getWebsiteContent returns siteTitle == \"welcome to waxy\".",
-        "The header displays \"welcome to waxy\" as the site title for unauthenticated visitors, without requiring any admin edits."
+        "Calling updateWebsiteContent as a non-admin principal does not trap with an 'Only admins' / unauthorized error.",
+        "Calling updateWebsiteContent without Internet Identity (anonymous actor) succeeds and persists the new WebsiteContent.",
+        "getWebsiteContent returns the updated content after a successful update."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Update the editor UI flow so it no longer blocks editing based on admin status or shows an 'Only administrators can edit' access-denied state.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "Its now saying only admins can editt"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Opening the editor from the \"Edit Site\" button does not show an access denied screen for non-admin users.",
+        "Saving from the editor succeeds for non-admin users and updates the visible site content after save.",
+        "No user-facing text in the editor mentions that only administrators can edit site content."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Remove/disable frontend admin-status queries and initialization behaviors that are only needed for admin-gated editing, so the app does not depend on admin checks for the edit flow.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "Its now saying only admins can editt"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The edit flow works end-to-end without requiring isCallerAdmin to be true.",
+        "The editor does not require a caffeineAdminToken URL parameter to function for non-admin users.",
+        "No React Query calls used solely to gate editing by admin status are required for the editor to open and save successfully."
       ]
     }
   ],
   "constraints": [
-    "Keep all Motoko logic in the single main actor (backend/main.mo).",
-    "Do not edit any frontend files under frontend/src/components/ui or other immutablePaths listed in SYSTEM_CONTEXT.",
-    "Use English for any user-facing text."
+    "Backend must remain a single Motoko actor in backend/main.mo.",
+    "Do not edit files under frontend/src/components/ui (compose them instead).",
+    "Do not edit frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Do not redesign the site layout or visual theme.",
-    "Do not change hero section, main section, footer text, or navigation labels unless explicitly requested.",
-    "Do not add new authentication methods beyond Internet Identity."
+    "Adding role-based permissions or an alternative authorization system for editing.",
+    "Implementing third-party authentication providers beyond Internet Identity.",
+    "Adding real-time collaborative editing."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

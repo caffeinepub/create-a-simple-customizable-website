@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Update the default persisted website content so the site title is exactly "welcome to waxy" on fresh deploy/uninitialized state.
+**Goal:** Allow any user (including anonymous) to edit and save website content without admin restrictions.
 
 **Planned changes:**
-- Update backend default/initial website content to set `siteTitle` to "welcome to waxy" when no prior saved content exists.
-- Ensure `getWebsiteContent` returns `siteTitle == "welcome to waxy"` on fresh deploy.
+- Update the backend `updateWebsiteContent` method to remove admin-only authorization so any caller (including anonymous) can successfully persist `WebsiteContent`.
+- Update the editor UI so it no longer blocks non-admin users or shows an “Only administrators can edit” access-denied state.
+- Remove/disable frontend admin-gating behaviors (e.g., reliance on `isCallerAdmin`, `caffeineAdminToken`, or React Query calls used only to gate editing) so the edit flow works end-to-end without admin checks.
 
-**User-visible outcome:** On a fresh deploy, unauthenticated visitors see the header site title displayed as "welcome to waxy" without requiring any admin edits.
+**User-visible outcome:** Clicking “Edit Site” opens the editor for anyone, and saving works for non-admin and anonymous users, with the updated content visible afterward.

@@ -14,13 +14,34 @@ export const UserRole = IDL.Variant({
   'guest' : IDL.Null,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const Alignment = IDL.Variant({
+  'center' : IDL.Null,
+  'left' : IDL.Null,
+  'right' : IDL.Null,
+});
+export const Position = IDL.Record({
+  'horizontal' : Alignment,
+  'vertical' : IDL.Variant({
+    'top' : IDL.Null,
+    'middle' : IDL.Null,
+    'bottom' : IDL.Null,
+  }),
+});
+export const HeroContent = IDL.Record({
+  'sectionBody' : IDL.Text,
+  'sectionTitle' : IDL.Text,
+  'bodyPosition' : Position,
+  'imageSrc' : IDL.Text,
+  'imagePosition' : Position,
+  'titlePosition' : Position,
+});
 export const Section = IDL.Record({
   'sectionBody' : IDL.Text,
   'sectionTitle' : IDL.Text,
 });
 export const WebsiteContent = IDL.Record({
   'siteTitle' : IDL.Text,
-  'heroSection' : Section,
+  'heroSection' : HeroContent,
   'footerText' : IDL.Text,
   'mainSection' : Section,
 });
@@ -50,13 +71,34 @@ export const idlFactory = ({ IDL }) => {
     'guest' : IDL.Null,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const Alignment = IDL.Variant({
+    'center' : IDL.Null,
+    'left' : IDL.Null,
+    'right' : IDL.Null,
+  });
+  const Position = IDL.Record({
+    'horizontal' : Alignment,
+    'vertical' : IDL.Variant({
+      'top' : IDL.Null,
+      'middle' : IDL.Null,
+      'bottom' : IDL.Null,
+    }),
+  });
+  const HeroContent = IDL.Record({
+    'sectionBody' : IDL.Text,
+    'sectionTitle' : IDL.Text,
+    'bodyPosition' : Position,
+    'imageSrc' : IDL.Text,
+    'imagePosition' : Position,
+    'titlePosition' : Position,
+  });
   const Section = IDL.Record({
     'sectionBody' : IDL.Text,
     'sectionTitle' : IDL.Text,
   });
   const WebsiteContent = IDL.Record({
     'siteTitle' : IDL.Text,
-    'heroSection' : Section,
+    'heroSection' : HeroContent,
     'footerText' : IDL.Text,
     'mainSection' : Section,
   });

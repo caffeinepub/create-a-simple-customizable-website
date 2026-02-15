@@ -89,23 +89,45 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface Position {
+    horizontal: Alignment;
+    vertical: Variant_top_middle_bottom;
+}
+export interface HeroContent {
+    sectionBody: string;
+    sectionTitle: string;
+    bodyPosition: Position;
+    imageSrc: string;
+    imagePosition: Position;
+    titlePosition: Position;
+}
 export interface Section {
     sectionBody: string;
     sectionTitle: string;
 }
 export interface WebsiteContent {
     siteTitle: string;
-    heroSection: Section;
+    heroSection: HeroContent;
     footerText: string;
     mainSection: Section;
 }
 export interface UserProfile {
     name: string;
 }
+export enum Alignment {
+    center = "center",
+    left = "left",
+    right = "right"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
+}
+export enum Variant_top_middle_bottom {
+    top = "top",
+    middle = "middle",
+    bottom = "bottom"
 }
 export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
@@ -118,7 +140,7 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     updateWebsiteContent(newContent: WebsiteContent): Promise<void>;
 }
-import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { Alignment as _Alignment, HeroContent as _HeroContent, Position as _Position, Section as _Section, UserProfile as _UserProfile, UserRole as _UserRole, WebsiteContent as _WebsiteContent } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -195,14 +217,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getWebsiteContent();
-                return result;
+                return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getWebsiteContent();
-            return result;
+            return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -236,23 +258,113 @@ export class Backend implements backendInterface {
     async updateWebsiteContent(arg0: WebsiteContent): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateWebsiteContent(arg0);
+                const result = await this.actor.updateWebsiteContent(to_candid_WebsiteContent_n15(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateWebsiteContent(arg0);
+            const result = await this.actor.updateWebsiteContent(to_candid_WebsiteContent_n15(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
 }
+function from_candid_Alignment_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Alignment): Alignment {
+    return from_candid_variant_n13(_uploadFile, _downloadFile, value);
+}
+function from_candid_HeroContent_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _HeroContent): HeroContent {
+    return from_candid_record_n9(_uploadFile, _downloadFile, value);
+}
+function from_candid_Position_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Position): Position {
+    return from_candid_record_n11(_uploadFile, _downloadFile, value);
+}
 function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
     return from_candid_variant_n5(_uploadFile, _downloadFile, value);
 }
+function from_candid_WebsiteContent_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _WebsiteContent): WebsiteContent {
+    return from_candid_record_n7(_uploadFile, _downloadFile, value);
+}
 function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    horizontal: _Alignment;
+    vertical: {
+        top: null;
+    } | {
+        middle: null;
+    } | {
+        bottom: null;
+    };
+}): {
+    horizontal: Alignment;
+    vertical: Variant_top_middle_bottom;
+} {
+    return {
+        horizontal: from_candid_Alignment_n12(_uploadFile, _downloadFile, value.horizontal),
+        vertical: from_candid_variant_n14(_uploadFile, _downloadFile, value.vertical)
+    };
+}
+function from_candid_record_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    siteTitle: string;
+    heroSection: _HeroContent;
+    footerText: string;
+    mainSection: _Section;
+}): {
+    siteTitle: string;
+    heroSection: HeroContent;
+    footerText: string;
+    mainSection: Section;
+} {
+    return {
+        siteTitle: value.siteTitle,
+        heroSection: from_candid_HeroContent_n8(_uploadFile, _downloadFile, value.heroSection),
+        footerText: value.footerText,
+        mainSection: value.mainSection
+    };
+}
+function from_candid_record_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    sectionBody: string;
+    sectionTitle: string;
+    bodyPosition: _Position;
+    imageSrc: string;
+    imagePosition: _Position;
+    titlePosition: _Position;
+}): {
+    sectionBody: string;
+    sectionTitle: string;
+    bodyPosition: Position;
+    imageSrc: string;
+    imagePosition: Position;
+    titlePosition: Position;
+} {
+    return {
+        sectionBody: value.sectionBody,
+        sectionTitle: value.sectionTitle,
+        bodyPosition: from_candid_Position_n10(_uploadFile, _downloadFile, value.bodyPosition),
+        imageSrc: value.imageSrc,
+        imagePosition: from_candid_Position_n10(_uploadFile, _downloadFile, value.imagePosition),
+        titlePosition: from_candid_Position_n10(_uploadFile, _downloadFile, value.titlePosition)
+    };
+}
+function from_candid_variant_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    center: null;
+} | {
+    left: null;
+} | {
+    right: null;
+}): Alignment {
+    return "center" in value ? Alignment.center : "left" in value ? Alignment.left : "right" in value ? Alignment.right : value;
+}
+function from_candid_variant_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    top: null;
+} | {
+    middle: null;
+} | {
+    bottom: null;
+}): Variant_top_middle_bottom {
+    return "top" in value ? Variant_top_middle_bottom.top : "middle" in value ? Variant_top_middle_bottom.middle : "bottom" in value ? Variant_top_middle_bottom.bottom : value;
 }
 function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
@@ -263,8 +375,80 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
+function to_candid_Alignment_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Alignment): _Alignment {
+    return to_candid_variant_n22(_uploadFile, _downloadFile, value);
+}
+function to_candid_HeroContent_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: HeroContent): _HeroContent {
+    return to_candid_record_n18(_uploadFile, _downloadFile, value);
+}
+function to_candid_Position_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Position): _Position {
+    return to_candid_record_n20(_uploadFile, _downloadFile, value);
+}
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_WebsiteContent_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: WebsiteContent): _WebsiteContent {
+    return to_candid_record_n16(_uploadFile, _downloadFile, value);
+}
+function to_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    siteTitle: string;
+    heroSection: HeroContent;
+    footerText: string;
+    mainSection: Section;
+}): {
+    siteTitle: string;
+    heroSection: _HeroContent;
+    footerText: string;
+    mainSection: _Section;
+} {
+    return {
+        siteTitle: value.siteTitle,
+        heroSection: to_candid_HeroContent_n17(_uploadFile, _downloadFile, value.heroSection),
+        footerText: value.footerText,
+        mainSection: value.mainSection
+    };
+}
+function to_candid_record_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    sectionBody: string;
+    sectionTitle: string;
+    bodyPosition: Position;
+    imageSrc: string;
+    imagePosition: Position;
+    titlePosition: Position;
+}): {
+    sectionBody: string;
+    sectionTitle: string;
+    bodyPosition: _Position;
+    imageSrc: string;
+    imagePosition: _Position;
+    titlePosition: _Position;
+} {
+    return {
+        sectionBody: value.sectionBody,
+        sectionTitle: value.sectionTitle,
+        bodyPosition: to_candid_Position_n19(_uploadFile, _downloadFile, value.bodyPosition),
+        imageSrc: value.imageSrc,
+        imagePosition: to_candid_Position_n19(_uploadFile, _downloadFile, value.imagePosition),
+        titlePosition: to_candid_Position_n19(_uploadFile, _downloadFile, value.titlePosition)
+    };
+}
+function to_candid_record_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    horizontal: Alignment;
+    vertical: Variant_top_middle_bottom;
+}): {
+    horizontal: _Alignment;
+    vertical: {
+        top: null;
+    } | {
+        middle: null;
+    } | {
+        bottom: null;
+    };
+} {
+    return {
+        horizontal: to_candid_Alignment_n21(_uploadFile, _downloadFile, value.horizontal),
+        vertical: to_candid_variant_n23(_uploadFile, _downloadFile, value.vertical)
+    };
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;
@@ -279,6 +463,36 @@ function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         user: null
     } : value == UserRole.guest ? {
         guest: null
+    } : value;
+}
+function to_candid_variant_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Alignment): {
+    center: null;
+} | {
+    left: null;
+} | {
+    right: null;
+} {
+    return value == Alignment.center ? {
+        center: null
+    } : value == Alignment.left ? {
+        left: null
+    } : value == Alignment.right ? {
+        right: null
+    } : value;
+}
+function to_candid_variant_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Variant_top_middle_bottom): {
+    top: null;
+} | {
+    middle: null;
+} | {
+    bottom: null;
+} {
+    return value == Variant_top_middle_bottom.top ? {
+        top: null
+    } : value == Variant_top_middle_bottom.middle ? {
+        middle: null
+    } : value == Variant_top_middle_bottom.bottom ? {
+        bottom: null
     } : value;
 }
 export interface CreateActorOptions {

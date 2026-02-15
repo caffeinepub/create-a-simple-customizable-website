@@ -1,19 +1,19 @@
-import { ShieldAlert } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function AccessDeniedScreen() {
   return (
     <div className="py-8">
       <Alert variant="destructive">
-        <ShieldAlert className="h-5 w-5" />
-        <AlertTitle className="text-lg font-semibold">Access Denied</AlertTitle>
+        <AlertCircle className="h-5 w-5" />
+        <AlertTitle className="text-lg font-semibold">Unable to Load Editor</AlertTitle>
         <AlertDescription className="mt-2">
-          You do not have permission to access the website editor. Only administrators can edit site content.
+          There was an error loading the website editor. Please try again later.
         </AlertDescription>
       </Alert>
       
       <div className="mt-6 text-center text-sm text-muted-foreground">
-        <p>If you believe this is an error, please contact your administrator.</p>
+        <p>If this problem persists, please refresh the page.</p>
       </div>
     </div>
   );

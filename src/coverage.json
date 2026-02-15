@@ -1,35 +1,67 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T06:51:24.135Z",
+  "generatedAt": "2026-02-15T09:58:06.725Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 0,
+    "total": 3,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-6",
-        "summary": "Update the default persisted website content so the site title text is exactly \"welcome to waxy\" (matching the user request) when the canister is freshly deployed or state is otherwise uninitialized.",
+        "id": "REQ-1",
+        "summary": "Update the backend so updating website content is no longer restricted to administrators (any caller, including anonymous, can call updateWebsiteContent successfully).",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Update the editor UI flow so it no longer blocks editing based on admin status or shows an 'Only administrators can edit' access-denied state.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/admin/AdminEditor.tsx",
+          "frontend/src/components/admin/AccessDeniedScreen.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/AdminEditor.tsx",
+          "frontend/src/components/admin/AccessDeniedScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Remove/disable frontend admin-status queries and initialization behaviors that are only needed for admin-gated editing, so the app does not depend on admin checks for the edit flow.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/hooks/useAdminAccess.ts",
+          "frontend/src/hooks/useAnonymousActor.ts",
+          "frontend/src/hooks/useAnonymousWebsiteContent.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/hooks/useAdminAccess.ts",
+          "frontend/src/hooks/useAnonymousActor.ts",
+          "frontend/src/hooks/useAnonymousWebsiteContent.ts"
+        ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
+    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
+    "frontend/src/components/admin/AccessDeniedScreen.tsx",
+    "frontend/src/components/admin/AdminEditor.tsx",
+    "frontend/src/hooks/useAdminAccess.ts",
+    "frontend/src/hooks/useAnonymousActor.ts",
+    "frontend/src/hooks/useAnonymousWebsiteContent.ts",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,17 +1,38 @@
+import Map "mo:core/Map";
+import Principal "mo:core/Principal";
 import Text "mo:core/Text";
 import Runtime "mo:core/Runtime";
-import Map "mo:core/Map";
-import Iter "mo:core/Iter";
-import Principal "mo:core/Principal";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
-import Migration "migration";
 
-// Use migration is used to update website content to
-(with migration = Migration.run)
 actor {
+  // Initialize the access control system
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+
+  public type Alignment = {
+    #left;
+    #center;
+    #right;
+  };
+
+  public type Position = {
+    horizontal : Alignment;
+    vertical : {
+      #top;
+      #middle;
+      #bottom;
+    };
+  };
+
+  public type HeroContent = {
+    sectionTitle : Text;
+    sectionBody : Text;
+    imageSrc : Text;
+    titlePosition : Position;
+    bodyPosition : Position;
+    imagePosition : Position;
+  };
 
   public type Section = {
     sectionTitle : Text;
@@ -20,7 +41,7 @@ actor {
 
   public type WebsiteContent = {
     siteTitle : Text;
-    heroSection : Section;
+    heroSection : HeroContent;
     mainSection : Section;
     footerText : Text;
   };
@@ -34,6 +55,19 @@ actor {
     heroSection = {
       sectionTitle = "Clean business websites with time tracking and invoice management";
       sectionBody = "Try our innovative platform for free";
+      imageSrc = "https://placehold.co/600x400";
+      titlePosition = {
+        horizontal = #left;
+        vertical = #top;
+      };
+      bodyPosition = {
+        horizontal = #left;
+        vertical = #middle;
+      };
+      imagePosition = {
+        horizontal = #right;
+        vertical = #top;
+      };
     };
     mainSection = {
       sectionTitle = "Empower your business with WAXY";
@@ -49,15 +83,13 @@ actor {
   };
 
   public shared ({ caller }) func updateWebsiteContent(newContent : WebsiteContent) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can edit website content");
-    };
+    // Per implementation plan: no authorization check - anyone including anonymous can update
     websiteContent := newContent;
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can access profiles");
+      Runtime.trap("Unauthorized: Only users can view profiles");
     };
     userProfiles.get(caller);
   };

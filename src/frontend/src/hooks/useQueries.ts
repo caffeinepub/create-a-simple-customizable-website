@@ -20,9 +20,9 @@ export function useUpdateWebsiteContent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newContent: WebsiteContent) => {
+    mutationFn: async (content: WebsiteContent) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateWebsiteContent(newContent);
+      return actor.updateWebsiteContent(content);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['websiteContent'] });
@@ -79,6 +79,7 @@ export function useGetCallerUserRole() {
   });
 }
 
+// Keep this hook but it's no longer used for editor access control
 export function useIsCallerAdmin() {
   const { actor, isFetching: actorFetching } = useActor();
 

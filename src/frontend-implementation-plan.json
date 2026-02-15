@@ -1,6 +1,64 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Frontend plan: no changes required for default site title update",
-  "requirements": []
+  "title": "Make site editor accessible to all users (remove admin-gated UI flow)",
+  "requirements": [
+    {
+      "id": "REQ-2",
+      "summary": "Remove any editor UI access-denied state and ensure anyone can open and save edits without admin gating text.",
+      "acceptanceCriteria": [
+        "Opening the editor from the \"Edit Site\" button does not show an access denied screen for non-admin users.",
+        "Saving from the editor succeeds for non-admin users and updates the visible site content after save.",
+        "No user-facing text in the editor mentions that only administrators can edit site content."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/AdminEditor.tsx",
+          "operation": "modify",
+          "description": "Update the editor to use non-admin-gated content read/save hooks (anonymous-capable) and remove any conditional rendering or messaging that implies admin-only access; keep error handling but ensure no copy mentions administrators. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/AccessDeniedScreen.tsx",
+          "operation": "modify",
+          "description": "Repurpose this screen into a generic editor error state (no admin/administrator wording) or otherwise ensure it cannot be shown from the edit flow; remove all user-facing copy stating only administrators can edit. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Ensure the \"Edit Site\" flow opens the editor without any admin checks and that post-save content refresh is visible (via existing query invalidation/refetch). Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Eliminate frontend admin-gating queries and token-dependent edit-flow behaviors so editing does not depend on admin checks or a caffeineAdminToken parameter.",
+      "acceptanceCriteria": [
+        "The edit flow works end-to-end without requiring isCallerAdmin to be true.",
+        "The editor does not require a caffeineAdminToken URL parameter to function for non-admin users.",
+        "No React Query calls used solely to gate editing by admin status are required for the editor to open and save successfully."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Remove/disable the admin-status query hook(s) used for gating (e.g., the isCallerAdmin query) so the editor flow no longer depends on them; keep website content hooks intact. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useAdminAccess.ts",
+          "operation": "modify",
+          "description": "Refactor or remove this hook so it no longer triggers admin-status queries for the edit flow; ensure any remaining usage does not gate editor open/save by admin role. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useAnonymousActor.ts",
+          "operation": "create",
+          "description": "Add a dedicated hook that provides an anonymous backend actor (not dependent on Internet Identity or any admin token), intended for public edit/save calls. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useAnonymousWebsiteContent.ts",
+          "operation": "create",
+          "description": "Add React Query hooks for reading/updating WebsiteContent using the anonymous actor (including invalidating the shared websiteContent query on successful save) so the editor can function without admin checks or caffeineAdminToken. Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
 }

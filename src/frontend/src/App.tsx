@@ -39,6 +39,10 @@ export default function App() {
           <HeroSection 
             title={content?.heroSection.sectionTitle || ''} 
             body={content?.heroSection.sectionBody || ''} 
+            imageSrc={content?.heroSection.imageSrc}
+            titlePosition={content?.heroSection.titlePosition}
+            bodyPosition={content?.heroSection.bodyPosition}
+            imagePosition={content?.heroSection.imagePosition}
           />
           
           <ContentSections 
@@ -52,12 +56,10 @@ export default function App() {
 
       {isAuthenticated && <ProfileSetupModal />}
       
-      {isEditorOpen && (
-        <AdminEditor 
-          isOpen={isEditorOpen} 
-          onClose={() => setIsEditorOpen(false)} 
-        />
-      )}
+      <AdminEditor 
+        isOpen={isEditorOpen} 
+        onClose={() => setIsEditorOpen(false)} 
+      />
 
       <Toaster />
     </>

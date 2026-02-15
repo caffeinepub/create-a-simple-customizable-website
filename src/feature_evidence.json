@@ -1,4 +1,47 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-update-the-editor-ui-flow-so-it-no-longer-blocks-editing-based-on-admin-status-or-shows-an-only-administrators-can-edit-access-denied-state",
+      "featureTitle": "Update the editor UI flow so it no longer blocks editing based on admin status or shows an 'Only administrators can edit' access-denied state.",
+      "files": [
+        "frontend/src/components/admin/AccessDeniedScreen.tsx",
+        "frontend/src/components/admin/AdminEditor.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-remove-disable-frontend-admin-status-queries-and-initialization-behaviors-that-are-only-needed-for-admin-gated-editing-so-the-app-does-not-depend-on-admin-checks-for-the-edit-flow",
+      "featureTitle": "Remove/disable frontend admin-status queries and initialization behaviors that are only needed for admin-gated editing, so the app does not depend on admin checks for the edit flow.",
+      "files": [
+        "frontend/src/hooks/useAdminAccess.ts",
+        "frontend/src/hooks/useAnonymousActor.ts",
+        "frontend/src/hooks/useAnonymousWebsiteContent.ts",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Menu, X, Edit } from 'lucide-react';
 import LoginButton from '../auth/LoginButton';
-import { useAdminAccess } from '../../hooks/useAdminAccess';
 import { Button } from '@/components/ui/button';
 
 interface HeaderNavProps {
@@ -11,7 +10,6 @@ interface HeaderNavProps {
 
 export default function HeaderNav({ siteTitle, onOpenEditor }: HeaderNavProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isAdmin } = useAdminAccess();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -49,17 +47,15 @@ export default function HeaderNav({ siteTitle, onOpenEditor }: HeaderNavProps) {
               About
             </button>
             
-            {isAdmin && (
-              <Button
-                onClick={onOpenEditor}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <Edit className="h-4 w-4" />
-                Edit Site
-              </Button>
-            )}
+            <Button
+              onClick={onOpenEditor}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              Edit Site
+            </Button>
             
             <LoginButton />
           </div>
@@ -92,18 +88,16 @@ export default function HeaderNav({ siteTitle, onOpenEditor }: HeaderNavProps) {
               About
             </button>
             
-            {isAdmin && (
-              <button
-                onClick={() => {
-                  onOpenEditor();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
-              >
-                <Edit className="h-4 w-4" />
-                Edit Site
-              </button>
-            )}
+            <button
+              onClick={() => {
+                onOpenEditor();
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors"
+            >
+              <Edit className="h-4 w-4" />
+              Edit Site
+            </button>
           </div>
         )}
       </nav>

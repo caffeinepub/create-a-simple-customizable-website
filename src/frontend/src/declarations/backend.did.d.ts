@@ -10,6 +10,23 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export type Alignment = { 'center' : null } |
+  { 'left' : null } |
+  { 'right' : null };
+export interface HeroContent {
+  'sectionBody' : string,
+  'sectionTitle' : string,
+  'bodyPosition' : Position,
+  'imageSrc' : string,
+  'imagePosition' : Position,
+  'titlePosition' : Position,
+}
+export interface Position {
+  'horizontal' : Alignment,
+  'vertical' : { 'top' : null } |
+    { 'middle' : null } |
+    { 'bottom' : null },
+}
 export interface Section { 'sectionBody' : string, 'sectionTitle' : string }
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
@@ -17,7 +34,7 @@ export type UserRole = { 'admin' : null } |
   { 'guest' : null };
 export interface WebsiteContent {
   'siteTitle' : string,
-  'heroSection' : Section,
+  'heroSection' : HeroContent,
   'footerText' : string,
   'mainSection' : Section,
 }
