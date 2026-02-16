@@ -51,9 +51,11 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getDraftContent(): Promise<WebsiteContent>;
+    getLiveContent(): Promise<WebsiteContent>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    getWebsiteContent(): Promise<WebsiteContent>;
     isCallerAdmin(): Promise<boolean>;
+    publishDraft(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateWebsiteContent(newContent: WebsiteContent): Promise<void>;
+    updateDraftContent(newContent: WebsiteContent): Promise<void>;
 }

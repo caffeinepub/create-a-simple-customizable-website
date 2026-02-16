@@ -1,23 +1,40 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project to convert current draft app into a permanent (stable/live) deployment.",
+  "summary": "New project",
   "architectural_notes": [
-    "Need a deployment/publishing flow to promote the current draft build to a permanent live environment."
+    "Support a deployment workflow that promotes a draft version to live/production."
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "existing_features": [],
+  "existing_features": [
+    {
+      "id": "feature-update-the-frontend-so-the-public-site-renders-the-live-website-content-by-default-not-the-draft-content",
+      "title": "Update the frontend so the public site renders the Live website content by default (not the Draft content).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-editor-flow-so-it-edits-draft-content-and-provides-an-explicit-publish-action-that-promotes-draft-to-live-with-clear-english-ui-text-and-confirmation-feedback",
+      "title": "Update the editor flow so it edits Draft content and provides an explicit “Publish” action that promotes Draft to Live, with clear English UI text and confirmation feedback.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    }
+  ],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Make the current draft app permanent by deploying a stable/live (non-draft) version.",
+      "summary": "Add a publish flow to promote a draft build to live/production",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Persist editable `websiteContent` in the backend so updates made via `updateWebsiteContent` survive canister redeploys/upgrades (draft expiration) instead of resetting to the hardcoded defaults.",
+      "summary": "Add backend support for separate Draft and Live website content states, including APIs to read Live content, read Draft content, update Draft content, and publish Draft to Live.",
       "reqIds": [
         "REQ-1"
       ],
@@ -25,22 +42,14 @@
     },
     {
       "id": "AR-3",
-      "summary": "Persist `userProfiles` in the backend so profiles saved via `saveCallerUserProfile` survive canister redeploys/upgrades and remain available through `getCallerUserProfile`/`getUserProfile` after an upgrade.",
+      "summary": "Implement a conditional Motoko state migration to preserve existing single-version website content by initializing both Draft and Live content from the current stored content on upgrade.",
       "reqIds": [
         "REQ-2"
       ],
       "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Add upgrade-safe state handling for existing deployed canisters by implementing conditional migration support (create `backend/migration.mo` if needed) so current `websiteContent` and `userProfiles` are preserved when upgrading older versions that did not store this state stably.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
     }
   ],
-  "projectName": "Make the app permanent by persisting website content and user profiles across redeploys/upgrades",
+  "projectName": "Add publish flow to promote draft website content to live",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

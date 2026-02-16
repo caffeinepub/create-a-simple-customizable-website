@@ -51,15 +51,17 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getDraftContent' : IDL.Func([], [WebsiteContent], ['query']),
+  'getLiveContent' : IDL.Func([], [WebsiteContent], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
-  'getWebsiteContent' : IDL.Func([], [WebsiteContent], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'publishDraft' : IDL.Func([], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'updateWebsiteContent' : IDL.Func([WebsiteContent], [], []),
+  'updateDraftContent' : IDL.Func([WebsiteContent], [], []),
 });
 
 export const idlInitArgs = [];
@@ -108,15 +110,17 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getDraftContent' : IDL.Func([], [WebsiteContent], ['query']),
+    'getLiveContent' : IDL.Func([], [WebsiteContent], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
-    'getWebsiteContent' : IDL.Func([], [WebsiteContent], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'publishDraft' : IDL.Func([], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'updateWebsiteContent' : IDL.Func([WebsiteContent], [], []),
+    'updateDraftContent' : IDL.Func([WebsiteContent], [], []),
   });
 };
 

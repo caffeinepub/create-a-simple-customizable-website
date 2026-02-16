@@ -1,20 +1,15 @@
 import { useState } from 'react';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetWebsiteContent } from './hooks/useQueries';
+import { useGetLiveContent } from './hooks/useQueries';
 import HeaderNav from './components/navigation/HeaderNav';
 import HeroSection from './components/sections/HeroSection';
 import ContentSections from './components/sections/ContentSections';
 import Footer from './components/sections/Footer';
 import AdminEditor from './components/admin/AdminEditor';
-import ProfileSetupModal from './components/auth/ProfileSetupModal';
 import { Toaster } from '@/components/ui/sonner';
 
 export default function App() {
-  const { identity } = useInternetIdentity();
-  const { data: content, isLoading } = useGetWebsiteContent();
+  const { data: content, isLoading } = useGetLiveContent();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-
-  const isAuthenticated = !!identity;
 
   if (isLoading) {
     return (
@@ -53,8 +48,6 @@ export default function App() {
         
         <Footer footerText={content?.footerText || ''} />
       </div>
-
-      {isAuthenticated && <ProfileSetupModal />}
       
       <AdminEditor 
         isOpen={isEditorOpen} 

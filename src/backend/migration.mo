@@ -1,42 +1,59 @@
+import Map "mo:core/Map";
+import Principal "mo:core/Principal";
+
 module {
-  type Section = {
+  public type Alignment = {
+    #left;
+    #center;
+    #right;
+  };
+  public type Position = {
+    horizontal : Alignment;
+    vertical : {
+      #top;
+      #middle;
+      #bottom;
+    };
+  };
+
+  public type HeroContent = {
+    sectionTitle : Text;
+    sectionBody : Text;
+    imageSrc : Text;
+    titlePosition : Position;
+    bodyPosition : Position;
+    imagePosition : Position;
+  };
+
+  public type Section = {
     sectionTitle : Text;
     sectionBody : Text;
   };
 
-  type WebsiteContent = {
+  public type WebsiteContent = {
     siteTitle : Text;
-    heroSection : Section;
+    heroSection : HeroContent;
     mainSection : Section;
     footerText : Text;
   };
 
-  // Old actor state
-  type OldActor = {
-    websiteContent : WebsiteContent;
-  };
+  public type UserProfile = { name : Text };
 
-  // New actor state
-  type NewActor = {
+  public type OldActor = {
     websiteContent : WebsiteContent;
+    userProfiles : Map.Map<Principal, UserProfile>;
+  };
+  public type NewActor = {
+    draftContent : WebsiteContent;
+    liveContent : WebsiteContent;
+    userProfiles : Map.Map<Principal, UserProfile>;
   };
 
   public func run(old : OldActor) : NewActor {
-    // Always set new default website content for migration
     {
-      old with
-      websiteContent = {
-        siteTitle = "welcome to waxy";
-        heroSection = {
-          sectionTitle = "Clean business websites with time tracking and invoice management";
-          sectionBody = "Try our innovative platform for free";
-        };
-        mainSection = {
-          sectionTitle = "Empower your business with WAXY";
-          sectionBody = "Launch a professional website on the Internet Computer in seconds. Use the productivity tools to simplify all business processes.";
-        };
-        footerText = "Built with WAXY on the Internet Computer.";
-      };
+      draftContent = old.websiteContent;
+      liveContent = old.websiteContent;
+      userProfiles = old.userProfiles;
     };
   };
 };

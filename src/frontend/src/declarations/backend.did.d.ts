@@ -43,11 +43,13 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getDraftContent' : ActorMethod<[], WebsiteContent>,
+  'getLiveContent' : ActorMethod<[], WebsiteContent>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'getWebsiteContent' : ActorMethod<[], WebsiteContent>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'publishDraft' : ActorMethod<[], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'updateWebsiteContent' : ActorMethod<[WebsiteContent], undefined>,
+  'updateDraftContent' : ActorMethod<[WebsiteContent], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

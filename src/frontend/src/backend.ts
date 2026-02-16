@@ -134,11 +134,13 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getDraftContent(): Promise<WebsiteContent>;
+    getLiveContent(): Promise<WebsiteContent>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    getWebsiteContent(): Promise<WebsiteContent>;
     isCallerAdmin(): Promise<boolean>;
+    publishDraft(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
-    updateWebsiteContent(newContent: WebsiteContent): Promise<void>;
+    updateDraftContent(newContent: WebsiteContent): Promise<void>;
 }
 import type { Alignment as _Alignment, HeroContent as _HeroContent, Position as _Position, Section as _Section, UserProfile as _UserProfile, UserRole as _UserRole, WebsiteContent as _WebsiteContent } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -199,6 +201,34 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getDraftContent(): Promise<WebsiteContent> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getDraftContent();
+                return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getDraftContent();
+            return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getLiveContent(): Promise<WebsiteContent> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getLiveContent();
+                return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getLiveContent();
+            return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -213,20 +243,6 @@ export class Backend implements backendInterface {
             return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getWebsiteContent(): Promise<WebsiteContent> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getWebsiteContent();
-                return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getWebsiteContent();
-            return from_candid_WebsiteContent_n6(this._uploadFile, this._downloadFile, result);
-        }
-    }
     async isCallerAdmin(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -238,6 +254,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.isCallerAdmin();
+            return result;
+        }
+    }
+    async publishDraft(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.publishDraft();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.publishDraft();
             return result;
         }
     }
@@ -255,17 +285,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async updateWebsiteContent(arg0: WebsiteContent): Promise<void> {
+    async updateDraftContent(arg0: WebsiteContent): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateWebsiteContent(to_candid_WebsiteContent_n15(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.updateDraftContent(to_candid_WebsiteContent_n15(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateWebsiteContent(to_candid_WebsiteContent_n15(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.updateDraftContent(to_candid_WebsiteContent_n15(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }

@@ -2,32 +2,23 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { WebsiteContent, UserProfile, UserRole } from '../backend';
 
-export function useGetWebsiteContent() {
+// Public site uses Live content
+export function useGetLiveContent() {
   const { actor, isFetching } = useActor();
 
   return useQuery<WebsiteContent>({
-    queryKey: ['websiteContent'],
+    queryKey: ['liveContent'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      return actor.getWebsiteContent();
+      return actor.getLiveContent();
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-export function useUpdateWebsiteContent() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (content: WebsiteContent) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.updateWebsiteContent(content);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['websiteContent'] });
-    },
-  });
+// Legacy hook for backward compatibility - now uses Live content
+export function useGetWebsiteContent() {
+  return useGetLiveContent();
 }
 
 export function useGetCallerUserProfile() {

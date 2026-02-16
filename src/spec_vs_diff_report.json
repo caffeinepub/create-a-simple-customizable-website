@@ -1,46 +1,77 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T05:07:38.608Z",
-  "summary": "The diff updates in-memory variables for `websiteContent` and `userProfiles` but does not add any stable storage (`stable var`) or `preupgrade`/`postupgrade` hooks, so state will still be lost on canister upgrade/redeploy. No conditional migration support was added. Additionally, `project_state.json` was modified though not requested by the BuildRequest.",
+  "generatedAt": "2026-02-16T06:52:18.515Z",
+  "summary": "Draft/Live content split and frontend hooks/components were added, but the backend introduces new admin-gated authorization for draft/publish APIs (violating the “anonymous callers” constraint) and includes extra admin/password-related UI/features not requested. Migration file exists, but conditional-upgrade behavior is not clearly evidenced in the diff summary.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Persist editable `websiteContent` so updates made via `updateWebsiteContent` survive canister redeploys/upgrades and default content is used only on fresh install.",
-      "reason": "`websiteContent` is stored in a non-stable `var` and there are no `stable var` declarations nor `system func preupgrade/postupgrade` to persist/restore state across upgrades.",
+      "requirement": "All content APIs remain usable by anonymous callers (no new admin/password gate introduced).",
+      "reason": "Backend methods for reading draft, updating draft, and publishing are explicitly restricted to admins and trap otherwise, introducing new authorization requirements and preventing anonymous use of the flow.",
       "evidence": [
         "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Editor flow edits Draft content and can publish to Live for anonymous visitors (no new auth/authorization requirements).",
+      "reason": "Frontend editor uses an anonymous actor to call draft/publish methods, but backend draft/publish endpoints require #admin permission and trap for non-admins, so anonymous visitors cannot successfully save/publish.",
+      "evidence": [
+        "frontend/src/hooks/useAnonymousWebsiteContent.ts",
+        "backend/main.mo",
+        "frontend/src/components/admin/AdminEditor.tsx"
       ]
     },
     {
       "id": "REQ-2",
-      "requirement": "Persist `userProfiles` so profiles saved via `saveCallerUserProfile` survive canister redeploys/upgrades and remain available via `getCallerUserProfile`/`getUserProfile` after upgrade while preserving existing authorization behavior.",
-      "reason": "`userProfiles` is stored in a non-stable `var` (`Map.empty`) with no upgrade hooks to serialize/restore it, so it will be cleared on upgrade.",
+      "requirement": "Migration follows the project’s conditional migration policy (only runs when upgrading from older state).",
+      "reason": "A migration module is added and wired via `(with migration = Migration.run)`, but the diff summary provides no evidence of a conditional guard/version check to ensure it only runs when upgrading from the older single-version state.",
       "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Add upgrade-safe state handling for existing deployed canisters via conditional migration support (optionally `backend/migration.mo`) so existing `websiteContent` and `userProfiles` are preserved when upgrading from older versions that didn’t store state stably.",
-      "reason": "No migration module was added and no conditional migration logic or upgrade hooks are present to preserve/transform legacy state.",
-      "evidence": [
+        "backend/migration.mo",
         "backend/main.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Project metadata update in `project_state.json` (adding new feature request entries AR-1..AR-4 / changing project state version).",
-      "reason": "The BuildRequest constraints and requirements focus on backend stable persistence and optional migration; it does not request modifying project tracking/metadata files.",
+      "description": "Admin-only authorization gating for draft viewing/editing/publishing (permission checks and traps).",
+      "reason": "BuildRequest explicitly disallows introducing new authentication/authorization requirements for editing/publishing and requires anonymous visitors can use the flow.",
       "evidence": [
-        "project_state.json"
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Access control / authorization system integration (AccessControl.initState, MixinAuthorization include).",
+      "reason": "Not requested for the publish flow and conflicts with the constraint to avoid adding new auth requirements for editing/publishing.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Admin-only “Change Edit Password” dialog feature in the frontend.",
+      "reason": "Not requested; also conflicts with “Do not introduce new authentication/authorization requirements”.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions frontend/src/components/admin/ChangeEditPasswordDialog.tsx)"
+      ]
+    },
+    {
+      "description": "Global styling/theme/SEO changes (tailwind theme extensions, index.html meta/dark mode default, index.css palette changes).",
+      "reason": "Not requested as part of adding a draft→live publish flow.",
+      "evidence": [
+        "frontend-file-summaries.txt (mentions frontend/src/index.css, frontend/tailwind.config.js, frontend/index.html)"
       ]
     }
   ],
-  "confidence": 0.83,
+  "confidence": 0.74,
   "changed_files": [
     "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/admin/AdminEditor.tsx",
+    "frontend/src/components/navigation/HeaderNav.tsx",
+    "frontend/src/hooks/useAnonymousWebsiteContent.ts",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }
