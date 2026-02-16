@@ -12,6 +12,8 @@ export function useGetAnonymousWebsiteContent() {
       return actor.getWebsiteContent();
     },
     enabled: !!actor && !isFetching,
+    retry: 2,
+    retryDelay: 1000,
   });
 }
 

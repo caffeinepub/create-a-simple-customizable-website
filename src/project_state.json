@@ -1,47 +1,46 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
-  "known_issues": [
-    "After removing the password, the app still shows 'only admins can edit' and blocks editing."
+  "summary": "Project to convert current draft app into a permanent (stable/live) deployment.",
+  "architectural_notes": [
+    "Need a deployment/publishing flow to promote the current draft build to a permanent live environment."
   ],
-  "isFixRequest": true,
-  "existing_features": [
-    {
-      "id": "feature-update-the-editor-ui-flow-so-it-no-longer-blocks-editing-based-on-admin-status-or-shows-an-only-administrators-can-edit-access-denied-state",
-      "title": "Update the editor UI flow so it no longer blocks editing based on admin status or shows an 'Only administrators can edit' access-denied state.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-disable-frontend-admin-status-queries-and-initialization-behaviors-that-are-only-needed-for-admin-gated-editing-so-the-app-does-not-depend-on-admin-checks-for-the-edit-flow",
-      "title": "Remove/disable frontend admin-status queries and initialization behaviors that are only needed for admin-gated editing, so the app does not depend on admin checks for the edit flow.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    }
-  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [],
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Allow anyone to edit the site (remove admin-only restriction) so no password/admin check blocks editing",
+      "summary": "Make the current draft app permanent by deploying a stable/live (non-draft) version.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Update the backend so updating website content is no longer restricted to administrators (any caller, including anonymous, can call updateWebsiteContent successfully).",
+      "summary": "Persist editable `websiteContent` in the backend so updates made via `updateWebsiteContent` survive canister redeploys/upgrades (draft expiration) instead of resetting to the hardcoded defaults.",
       "reqIds": [
         "REQ-1"
       ],
       "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Persist `userProfiles` in the backend so profiles saved via `saveCallerUserProfile` survive canister redeploys/upgrades and remain available through `getCallerUserProfile`/`getUserProfile` after an upgrade.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add upgrade-safe state handling for existing deployed canisters by implementing conditional migration support (create `backend/migration.mo` if needed) so current `websiteContent` and `userProfiles` are preserved when upgrading older versions that did not store this state stably.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
     }
   ],
-  "projectName": "Remove admin-only restriction so anyone can edit site content",
+  "projectName": "Make the app permanent by persisting website content and user profiles across redeploys/upgrades",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

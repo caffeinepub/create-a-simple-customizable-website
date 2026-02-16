@@ -1,85 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Remove admin-only restriction so anyone can edit site content",
-  "priority": "high",
+  "title": "Make the app permanent by persisting website content and user profiles across redeploys/upgrades",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the backend so updating website content is no longer restricted to administrators (any caller, including anonymous, can call updateWebsiteContent successfully).",
+      "text": "Persist editable `websiteContent` in the backend so updates made via `updateWebsiteContent` survive canister redeploys/upgrades (draft expiration) instead of resetting to the hardcoded defaults.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "Its now saying only admins can editt"
+          "I want this to be permenent"
         ]
       },
       "acceptanceCriteria": [
-        "Calling updateWebsiteContent as a non-admin principal does not trap with an 'Only admins' / unauthorized error.",
-        "Calling updateWebsiteContent without Internet Identity (anonymous actor) succeeds and persists the new WebsiteContent.",
-        "getWebsiteContent returns the updated content after a successful update."
+        "After calling `updateWebsiteContent`, the updated content is still returned by `getWebsiteContent` after a canister upgrade/redeploy.",
+        "On a fresh install (no prior state), `getWebsiteContent` returns the existing default content currently defined in `backend/main.mo`."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update the editor UI flow so it no longer blocks editing based on admin status or shows an 'Only administrators can edit' access-denied state.",
-      "target": "frontend",
+      "text": "Persist `userProfiles` in the backend so profiles saved via `saveCallerUserProfile` survive canister redeploys/upgrades and remain available through `getCallerUserProfile`/`getUserProfile` after an upgrade.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "Its now saying only admins can editt"
+          "I want this to be permenent"
         ]
       },
       "acceptanceCriteria": [
-        "Opening the editor from the \"Edit Site\" button does not show an access denied screen for non-admin users.",
-        "Saving from the editor succeeds for non-admin users and updates the visible site content after save.",
-        "No user-facing text in the editor mentions that only administrators can edit site content."
+        "After calling `saveCallerUserProfile`, the saved profile is still returned by `getCallerUserProfile` after a canister upgrade/redeploy.",
+        "Existing authorization checks for profile read/write continue to work (unauthorized callers still trap as before)."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Remove/disable frontend admin-status queries and initialization behaviors that are only needed for admin-gated editing, so the app does not depend on admin checks for the edit flow.",
-      "target": "frontend",
+      "text": "Add upgrade-safe state handling for existing deployed canisters by implementing conditional migration support (create `backend/migration.mo` if needed) so current `websiteContent` and `userProfiles` are preserved when upgrading older versions that did not store this state stably.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "Its now saying only admins can editt"
+          "I want this to be permenent"
         ]
       },
       "acceptanceCriteria": [
-        "The edit flow works end-to-end without requiring isCallerAdmin to be true.",
-        "The editor does not require a caffeineAdminToken URL parameter to function for non-admin users.",
-        "No React Query calls used solely to gate editing by admin status are required for the editor to open and save successfully."
+        "Upgrading from the current version to the new version does not wipe existing `websiteContent` or `userProfiles`.",
+        "If no legacy migration is needed for this project state, the implementation avoids unnecessary migration complexity and still preserves state across subsequent upgrades."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo.",
-    "Do not edit files under frontend/src/components/ui (compose them instead).",
-    "Do not edit frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui."
+    "Backend must remain a single Motoko actor with all logic in `backend/main.mo` (add `backend/migration.mo` only if required for conditional migration).",
+    "Do not modify any files under `frontend/src/components/ui` or the immutable hook/bootstrap paths listed in SYSTEM_CONTEXT."
   ],
   "nonGoals": [
-    "Adding role-based permissions or an alternative authorization system for editing.",
-    "Implementing third-party authentication providers beyond Internet Identity.",
-    "Adding real-time collaborative editing."
+    "Adding new authentication providers beyond Internet Identity.",
+    "Introducing external databases or non-Motoko backend services.",
+    "Redesigning the UI/UX beyond what is necessary to support permanent persistence."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

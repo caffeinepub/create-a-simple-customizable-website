@@ -1,7 +1,6 @@
-import Map "mo:core/Map";
 import Principal "mo:core/Principal";
-import Text "mo:core/Text";
 import Runtime "mo:core/Runtime";
+import Map "mo:core/Map";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 
@@ -76,14 +75,16 @@ actor {
     footerText = "Built with WAXY on the Internet Computer.";
   };
 
-  let userProfiles = Map.empty<Principal, UserProfile>();
+  var userProfiles = Map.empty<Principal, UserProfile>();
 
   public query ({ caller }) func getWebsiteContent() : async WebsiteContent {
     websiteContent;
   };
 
   public shared ({ caller }) func updateWebsiteContent(newContent : WebsiteContent) : async () {
-    // Per implementation plan: no authorization check - anyone including anonymous can update
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update website content");
+    };
     websiteContent := newContent;
   };
 

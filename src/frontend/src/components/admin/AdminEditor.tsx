@@ -14,11 +14,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, Save, Eye, Edit } from 'lucide-react';
+import { AlertCircle, Save, Eye, Edit, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AdminEditorProps {
@@ -34,7 +34,7 @@ const AVAILABLE_IMAGES = [
 ];
 
 export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
-  const { data: content, isLoading: contentLoading } = useGetAnonymousWebsiteContent();
+  const { data: content, isLoading: contentLoading, error: contentError, refetch } = useGetAnonymousWebsiteContent();
   const { mutate: updateContent, isPending, error, isSuccess, reset: resetMutation } = useUpdateAnonymousWebsiteContent();
 
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
@@ -121,6 +121,10 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
     });
   };
 
+  const handleRetry = () => {
+    refetch();
+  };
+
   if (contentLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -129,6 +133,43 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
             <div className="text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
               <p className="mt-4 text-muted-foreground">Loading editor...</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (contentError) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Unable to Load Content</DialogTitle>
+            <DialogDescription>
+              There was a problem loading the website content for editing.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-6">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Loading Failed</AlertTitle>
+              <AlertDescription className="mt-2">
+                {contentError instanceof Error 
+                  ? contentError.message 
+                  : 'An unexpected error occurred while loading the website content. This may happen if the application was recently redeployed or if there is a network issue.'}
+              </AlertDescription>
+            </Alert>
+            
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="outline" onClick={handleClose}>
+                Close
+              </Button>
+              <Button onClick={handleRetry} className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                Try Again
+              </Button>
             </div>
           </div>
         </DialogContent>
@@ -422,15 +463,15 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
                   <Button type="button" variant="outline" onClick={handleClose} disabled={isPending}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isPending}>
+                  <Button type="submit" disabled={isPending} className="gap-2">
                     {isPending ? (
                       <>
-                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
                         Saving...
                       </>
                     ) : (
                       <>
-                        <Save className="mr-2 h-4 w-4" />
+                        <Save className="h-4 w-4" />
                         Save Changes
                       </>
                     )}
@@ -462,7 +503,7 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
                         horizontal: formData.imageHorizontal,
                         vertical: formData.imageVertical,
                       }}
-                      isPreview
+                      isPreview={true}
                     />
                   </div>
                 </div>
@@ -470,8 +511,8 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
                 <div className="bg-muted/30 rounded-lg p-4">
                   <h3 className="text-sm font-medium text-muted-foreground mb-4">Main Content Preview</h3>
                   <div className="bg-background rounded border border-border p-8">
-                    <div className="max-w-4xl mx-auto text-center">
-                      <h2 className="text-3xl font-bold mb-4">{formData.mainTitle}</h2>
+                    <div className="max-w-4xl mx-auto text-center space-y-4">
+                      <h2 className="text-3xl font-bold">{formData.mainTitle}</h2>
                       <p className="text-lg text-muted-foreground">{formData.mainBody}</p>
                     </div>
                   </div>

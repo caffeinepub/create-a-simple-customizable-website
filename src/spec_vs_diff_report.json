@@ -1,42 +1,46 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T09:58:06.723Z",
-  "summary": "Backend updateWebsiteContent authorization check was removed, and the frontend editor was updated to use anonymous-actor hooks with non-admin messaging in the error screen. However, based on the provided diff summary, some REQ-3 acceptance criteria (notably around removing the caffeineAdminToken dependency and fully disabling admin-gating queries/initialization) cannot be confirmed as implemented.",
+  "generatedAt": "2026-02-16T05:07:38.608Z",
+  "summary": "The diff updates in-memory variables for `websiteContent` and `userProfiles` but does not add any stable storage (`stable var`) or `preupgrade`/`postupgrade` hooks, so state will still be lost on canister upgrade/redeploy. No conditional migration support was added. Additionally, `project_state.json` was modified though not requested by the BuildRequest.",
   "missing_requirements": [
     {
-      "id": "REQ-3",
-      "requirement": "The editor does not require a caffeineAdminToken URL parameter to function for non-admin users.",
-      "reason": "No evidence in the diff summary shows removal/ignoring of a caffeineAdminToken URL parameter or related initialization logic (e.g., parsing query params, conditional editor enabling). The only shown changes add anonymous actor hooks and keep admin-check hooks \"for backward compatibility,\" but do not mention caffeineAdminToken handling.",
+      "id": "REQ-1",
+      "requirement": "Persist editable `websiteContent` so updates made via `updateWebsiteContent` survive canister redeploys/upgrades and default content is used only on fresh install.",
+      "reason": "`websiteContent` is stored in a non-stable `var` and there are no `stable var` declarations nor `system func preupgrade/postupgrade` to persist/restore state across upgrades.",
       "evidence": [
-        "frontend/src/hooks/useAdminAccess.ts",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend-file-summaries.txt"
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "Persist `userProfiles` so profiles saved via `saveCallerUserProfile` survive canister redeploys/upgrades and remain available via `getCallerUserProfile`/`getUserProfile` after upgrade while preserving existing authorization behavior.",
+      "reason": "`userProfiles` is stored in a non-stable `var` (`Map.empty`) with no upgrade hooks to serialize/restore it, so it will be cleared on upgrade.",
+      "evidence": [
+        "backend/main.mo"
       ]
     },
     {
       "id": "REQ-3",
-      "requirement": "Remove/disable frontend admin-status queries and initialization behaviors that are only needed for admin-gated editing, so the app does not depend on admin checks for the edit flow.",
-      "reason": "The diff shows admin-status query hook useIsCallerAdmin is still present and useAdminAccess still calls useIsCallerAdmin (which would trigger a React Query call when used). The summary claims these hooks are \"no longer used for editor access,\" but the diff does not include evidence (e.g., App.tsx/AdminEditor caller changes) proving these queries/initialization behaviors are fully removed/disabled from the edit flow.",
+      "requirement": "Add upgrade-safe state handling for existing deployed canisters via conditional migration support (optionally `backend/migration.mo`) so existing `websiteContent` and `userProfiles` are preserved when upgrading from older versions that didn’t store state stably.",
+      "reason": "No migration module was added and no conditional migration logic or upgrade hooks are present to preserve/transform legacy state.",
       "evidence": [
-        "frontend/src/hooks/useAdminAccess.ts",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/components/admin/AdminEditor.tsx (truncated)",
-        "frontend-file-summaries.txt"
+        "backend/main.mo"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.62,
+  "hallucinated_features": [
+    {
+      "description": "Project metadata update in `project_state.json` (adding new feature request entries AR-1..AR-4 / changing project state version).",
+      "reason": "The BuildRequest constraints and requirements focus on backend stable persistence and optional migration; it does not request modifying project tracking/metadata files.",
+      "evidence": [
+        "project_state.json"
+      ]
+    }
+  ],
+  "confidence": 0.83,
   "changed_files": [
     "backend/main.mo",
-    "frontend-file-summaries.txt",
-    "frontend/src/components/admin/AccessDeniedScreen.tsx",
-    "frontend/src/components/admin/AdminEditor.tsx",
-    "frontend/src/hooks/useAdminAccess.ts",
-    "frontend/src/hooks/useAnonymousActor.ts",
-    "frontend/src/hooks/useAnonymousWebsiteContent.ts",
-    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

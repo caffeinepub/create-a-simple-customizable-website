@@ -1,52 +1,35 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T09:58:06.725Z",
+  "generatedAt": "2026-02-16T05:07:38.611Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 2,
+    "implemented": 0,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the backend so updating website content is no longer restricted to administrators (any caller, including anonymous, can call updateWebsiteContent successfully).",
+        "summary": "Persist editable `websiteContent` in the backend so updates made via `updateWebsiteContent` survive canister redeploys/upgrades (draft expiration) instead of resetting to the hardcoded defaults.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Update the editor UI flow so it no longer blocks editing based on admin status or shows an 'Only administrators can edit' access-denied state.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/admin/AdminEditor.tsx",
-          "frontend/src/components/admin/AccessDeniedScreen.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/admin/AdminEditor.tsx",
-          "frontend/src/components/admin/AccessDeniedScreen.tsx"
-        ]
+        "summary": "Persist `userProfiles` in the backend so profiles saved via `saveCallerUserProfile` survive canister redeploys/upgrades and remain available through `getCallerUserProfile`/`getUserProfile` after an upgrade.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-3",
-        "summary": "Remove/disable frontend admin-status queries and initialization behaviors that are only needed for admin-gated editing, so the app does not depend on admin checks for the edit flow.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/hooks/useAdminAccess.ts",
-          "frontend/src/hooks/useAnonymousActor.ts",
-          "frontend/src/hooks/useAnonymousWebsiteContent.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/hooks/useAdminAccess.ts",
-          "frontend/src/hooks/useAnonymousActor.ts",
-          "frontend/src/hooks/useAnonymousWebsiteContent.ts"
-        ]
+        "summary": "Add upgrade-safe state handling for existing deployed canisters by implementing conditional migration support (create `backend/migration.mo` if needed) so current `websiteContent` and `userProfiles` are preserved when upgrading older versions that did not store this state stably.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
@@ -54,14 +37,11 @@
     "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
-    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/admin/AccessDeniedScreen.tsx",
-    "frontend/src/components/admin/AdminEditor.tsx",
-    "frontend/src/hooks/useAdminAccess.ts",
-    "frontend/src/hooks/useAnonymousActor.ts",
-    "frontend/src/hooks/useAnonymousWebsiteContent.ts",
-    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
