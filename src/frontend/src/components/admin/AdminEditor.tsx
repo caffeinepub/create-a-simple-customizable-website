@@ -44,7 +44,7 @@ const AVAILABLE_IMAGES = [
 ];
 
 export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
-  const { data: content, isLoading: contentLoading, error: contentError, refetch } = useGetDraftContent();
+  const { data: content, isLoading: contentLoading, error: contentError, refetch } = useGetDraftContent(isOpen);
   const { mutate: updateDraft, isPending: isSaving, error: saveError, isSuccess: saveSuccess, reset: resetSaveMutation } = useUpdateDraftContent();
   const { mutate: publishDraft, isPending: isPublishing, error: publishError, isSuccess: publishSuccess, reset: resetPublishMutation } = usePublishDraft();
 
@@ -104,6 +104,37 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
       handleClose();
     }
   }, [publishSuccess, resetPublishMutation]);
+
+  // Log errors for debugging
+  useEffect(() => {
+    if (contentError) {
+      console.error('AdminEditor - Draft content load error:', {
+        message: contentError instanceof Error ? contentError.message : 'Unknown error',
+        error: contentError,
+        stack: contentError instanceof Error ? contentError.stack : undefined,
+      });
+    }
+  }, [contentError]);
+
+  useEffect(() => {
+    if (saveError) {
+      console.error('AdminEditor - Draft save error:', {
+        message: saveError instanceof Error ? saveError.message : 'Unknown error',
+        error: saveError,
+        stack: saveError instanceof Error ? saveError.stack : undefined,
+      });
+    }
+  }, [saveError]);
+
+  useEffect(() => {
+    if (publishError) {
+      console.error('AdminEditor - Publish error:', {
+        message: publishError instanceof Error ? publishError.message : 'Unknown error',
+        error: publishError,
+        stack: publishError instanceof Error ? publishError.stack : undefined,
+      });
+    }
+  }, [publishError]);
 
   const handleClose = () => {
     resetSaveMutation();
@@ -173,6 +204,10 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
   }
 
   if (contentError) {
+    const errorMessage = contentError instanceof Error 
+      ? contentError.message 
+      : 'An unexpected error occurred while loading the website content. Please try again.';
+    
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-2xl">
@@ -188,9 +223,7 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Loading Failed</AlertTitle>
               <AlertDescription className="mt-2">
-                {contentError instanceof Error 
-                  ? contentError.message 
-                  : 'An unexpected error occurred while loading the website content. Please try again.'}
+                {errorMessage}
               </AlertDescription>
             </Alert>
             
@@ -226,7 +259,7 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Failed to save draft. Please try again.
+                Failed to save draft: {saveError instanceof Error ? saveError.message : 'Please try again.'}
               </AlertDescription>
             </Alert>
           )}
@@ -235,7 +268,7 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Failed to publish changes. Please try again.
+                Failed to publish changes: {publishError instanceof Error ? publishError.message : 'Please try again.'}
               </AlertDescription>
             </Alert>
           )}
@@ -354,9 +387,9 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
                     </div>
 
                     <div className="space-y-4 p-3 bg-background rounded border border-border">
-                      <h4 className="font-medium text-sm">Layout & Positioning</h4>
+                      <h4 className="font-medium text-sm">Layout Controls</h4>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="titleHorizontal">Title Horizontal</Label>
                           <Select
@@ -512,7 +545,7 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
                       {isSaving ? (
                         <>
                           <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
-                          Saving Draft...
+                          Saving...
                         </>
                       ) : (
                         <>
@@ -548,34 +581,42 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
               <ScrollArea className="h-[calc(95vh-220px)]">
                 <div className="space-y-8 pb-8">
                   <div className="bg-muted/30 rounded-lg p-4">
-                    <p className="text-sm text-muted-foreground mb-4">Preview of your draft changes:</p>
-                    <HeroSection
-                      title={formData.heroTitle}
-                      body={formData.heroBody}
-                      imageSrc={previewImageSrc}
-                      titlePosition={{
-                        horizontal: formData.titleHorizontal,
-                        vertical: formData.titleVertical,
-                      }}
-                      bodyPosition={{
-                        horizontal: formData.bodyHorizontal,
-                        vertical: formData.bodyVertical,
-                      }}
-                      imagePosition={{
-                        horizontal: formData.imageHorizontal,
-                        vertical: formData.imageVertical,
-                      }}
-                      isPreview={true}
-                    />
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4">Hero Section Preview</h3>
+                    <div className="bg-background rounded border">
+                      <HeroSection
+                        title={formData.heroTitle}
+                        body={formData.heroBody}
+                        imageSrc={previewImageSrc}
+                        titlePosition={{
+                          horizontal: formData.titleHorizontal,
+                          vertical: formData.titleVertical,
+                        }}
+                        bodyPosition={{
+                          horizontal: formData.bodyHorizontal,
+                          vertical: formData.bodyVertical,
+                        }}
+                        imagePosition={{
+                          horizontal: formData.imageHorizontal,
+                          vertical: formData.imageVertical,
+                        }}
+                        isPreview
+                      />
+                    </div>
                   </div>
 
-                  <div className="space-y-4 p-6 bg-background rounded-lg border">
-                    <h3 className="text-2xl font-bold">{formData.mainTitle}</h3>
-                    <p className="text-muted-foreground">{formData.mainBody}</p>
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4">Main Section Preview</h3>
+                    <div className="bg-background rounded border p-8">
+                      <h2 className="text-3xl font-bold mb-4">{formData.mainTitle}</h2>
+                      <p className="text-muted-foreground">{formData.mainBody}</p>
+                    </div>
                   </div>
 
-                  <div className="p-4 bg-muted/30 rounded-lg">
-                    <p className="text-sm text-center text-muted-foreground">{formData.footerText}</p>
+                  <div className="bg-muted/30 rounded-lg p-4">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4">Footer Preview</h3>
+                    <div className="bg-background rounded border p-6 text-center">
+                      <p className="text-sm text-muted-foreground">{formData.footerText}</p>
+                    </div>
                   </div>
                 </div>
               </ScrollArea>
@@ -589,14 +630,13 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Publish Changes Live?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will make your draft changes visible to all visitors on the public website. 
-              Make sure you've saved your draft first.
+              This will make your draft changes visible to all visitors immediately. Make sure you've saved your draft first.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handlePublishConfirm} className="bg-green-600 hover:bg-green-700">
-              Publish Live
+              Publish Now
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

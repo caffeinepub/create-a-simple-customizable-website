@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add a publish flow so website content can be edited as Draft and then promoted to Live for the public site.
+**Goal:** Fix the build/deploy failure so the project reliably builds and deploys with the standard Internet Computer workflow (backend canister + frontend assets).
 
 **Planned changes:**
-- Update backend data model to persist separate Draft and Live versions of website content.
-- Add backend APIs to read Live content, read Draft content, update Draft content, and publish Draft to Live atomically.
-- Add a conditional Motoko state migration so existing single-version content becomes both initial Live and Draft on upgrade.
-- Update the public frontend to render Live content by default.
-- Update the editor to load/edit/save Draft content and include an explicit “Publish” action with clear English success/failure feedback, and refetch/invalidate so the site reflects published changes without a hard refresh.
+- Identify the exact step causing the failed deployment and apply minimal fixes to restore a clean `dfx deploy`.
+- Ensure Motoko backend builds without compilation errors and initializes without runtime traps.
+- Ensure the frontend TypeScript/Vite build completes without compilation errors (without modifying immutable frontend paths).
+- Improve deploy/build logging output so any future failure clearly reports the failing step and error details.
 
-**User-visible outcome:** Visitors see only Live content on the public site, while editors can save Draft changes privately and explicitly publish them to make updates appear on the live site.
+**User-visible outcome:** Developers can run the standard build and complete a full `dfx deploy` (backend + frontend) successfully; if a failure occurs, logs clearly show the exact failing step and error output.

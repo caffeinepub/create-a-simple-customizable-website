@@ -3,9 +3,7 @@ import Map "mo:core/Map";
 import Runtime "mo:core/Runtime";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   // Access control system
   let accessControlState = AccessControl.initState();
@@ -79,6 +77,7 @@ actor {
     footerText = "Built with WAXY on the Internet Computer.";
   };
 
+  // Draft content is now public
   var draftContent : WebsiteContent = liveContent;
   var userProfiles = Map.empty<Principal, UserProfile>();
 
@@ -90,26 +89,17 @@ actor {
   };
 
   public query ({ caller }) func getDraftContent() : async WebsiteContent {
-    // Only admins can view draft content
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can view draft content");
-    };
+    // Now public access - no admin check needed
     draftContent;
   };
 
   public shared ({ caller }) func updateDraftContent(newContent : WebsiteContent) : async () {
-    // Only admins can update draft content
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can update draft content");
-    };
+    // Publicly accessible - no admin check needed
     draftContent := newContent;
   };
 
   public shared ({ caller }) func publishDraft() : async () {
-    // Only admins can publish draft to live
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can publish content");
-    };
+    // Publish action is now public - no admin check needed
     liveContent := draftContent;
   };
 
@@ -124,10 +114,13 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    // First check if caller has at least user-level permission
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view profiles");
+    };
     // Users can view their own profile, but only admins can view others
-    let isViewingOwnProfile = caller == user;
-    if (not isViewingOwnProfile and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view profiles of other users");
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
     };
     userProfiles.get(user);
   };

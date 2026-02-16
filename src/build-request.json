@@ -1,105 +1,43 @@
 {
   "kind": "build_request",
-  "title": "Add publish flow to promote draft website content to live",
-  "priority": "normal",
+  "title": "Retry deployment by fixing build/deploy failure and ensuring clean dfx deploy",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Add backend support for separate Draft and Live website content states, including APIs to read Live content, read Draft content, update Draft content, and publish Draft to Live.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Make draft into live"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend persists two versions of WebsiteContent: a Live version used by site visitors and a Draft version used by the editor.",
-        "Backend exposes separate methods for: getLiveWebsiteContent, getDraftWebsiteContent, updateDraftWebsiteContent, and publishDraftToLive (names can vary but must be distinct and unambiguous in the candid interface).",
-        "Publishing copies the current Draft content into Live atomically.",
-        "All content APIs remain usable by anonymous callers (no new admin/password gate introduced)."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Implement a conditional Motoko state migration to preserve existing single-version website content by initializing both Draft and Live content from the current stored content on upgrade.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Make draft into live"
-        ]
-      },
-      "acceptanceCriteria": [
-        "On upgrade, existing stored website content is not lost.",
-        "After migration, Live content equals the pre-upgrade content, and Draft content is initialized to the same value.",
-        "Migration follows the project’s conditional migration policy (only runs when upgrading from older state)."
-      ]
-    },
-    {
       "id": "REQ-3",
-      "text": "Update the frontend so the public site renders the Live website content by default (not the Draft content).",
-      "target": "frontend",
+      "text": "Identify and fix the cause of the failed deployment, ensuring the project builds and deploys successfully using the standard Internet Computer workflow (backend canister + frontend assets).",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-1",
+          "msg-2",
+          "msg-3"
         ],
         "quotes": [
-          "Make draft into live"
+          "deployment failed",
+          "Retry"
         ]
       },
       "acceptanceCriteria": [
-        "On a fresh page load, the main site UI (header, hero, main section, footer) displays the Live content.",
-        "No draft-only edits appear on the public site until a publish action is performed."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Update the editor flow so it edits Draft content and provides an explicit “Publish” action that promotes Draft to Live, with clear English UI text and confirmation feedback.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Make draft into live"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The editor loads Draft content into its form fields (not Live).",
-        "Saving from the editor updates Draft only.",
-        "The editor includes a distinct “Publish” button that calls the backend publish operation.",
-        "After publishing, the public site reflects the newly published content (Live) without requiring a hard refresh (React Query cache invalidation/refetch is sufficient).",
-        "User-facing messages for save/publish success/failure are in English and clearly distinguish between saving a draft and publishing live."
+        "Running the standard build produces no Motoko compilation errors for the backend canister.",
+        "Running the standard build produces no TypeScript/Vite compilation errors for the frontend.",
+        "A full deploy completes successfully (backend + frontend) without runtime traps during initialization.",
+        "If the deployment fails again, surface the exact failing step and error output in logs so it is actionable to fix."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
-    "Do not edit frontend files under immutablePaths (e.g., frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui). Compose them instead.",
-    "Do not introduce new authentication/authorization requirements for editing or publishing; anonymous visitors must still be able to use the flow."
+    "Keep all Motoko logic in the single main actor (backend/main.mo).",
+    "Do not edit frontend files in immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Adding role-based publishing permissions or an admin-only publish gate.",
-    "Adding real-time collaboration or live multi-user editing.",
-    "Adding external databases or third-party services for storage or deployment."
+    "Adding new product features unrelated to fixing the deployment failure.",
+    "Changing authentication providers beyond Internet Identity.",
+    "Introducing external databases or services."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

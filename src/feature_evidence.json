@@ -2,11 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-frontend-so-the-public-site-renders-the-live-website-content-by-default-not-the-draft-content",
-      "featureTitle": "Update the frontend so the public site renders the Live website content by default (not the Draft content).",
+      "featureId": "feature-identify-and-fix-the-cause-of-the-failed-deployment-ensuring-the-project-builds-and-deploys-successfully-using-the-standard-internet-computer-workflow-backend-canister-frontend-assets",
+      "featureTitle": "Identify and fix the cause of the failed deployment, ensuring the project builds and deploys successfully using the standard Internet Computer workflow (backend canister + frontend assets).",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/admin/AdminEditor.tsx",
+        "frontend/src/components/common/LiveContentErrorState.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,28 +19,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-editor-flow-so-it-edits-draft-content-and-provides-an-explicit-publish-action-that-promotes-draft-to-live-with-clear-english-ui-text-and-confirmation-feedback",
-      "featureTitle": "Update the editor flow so it edits Draft content and provides an explicit “Publish” action that promotes Draft to Live, with clear English UI text and confirmation feedback.",
-      "files": [
-        "frontend/src/components/admin/AdminEditor.tsx",
-        "frontend/src/components/navigation/HeaderNav.tsx",
-        "frontend/src/hooks/useAnonymousWebsiteContent.ts",
-        "frontend/src/hooks/useQueries.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
       ],
       "confidence": "high"
     }

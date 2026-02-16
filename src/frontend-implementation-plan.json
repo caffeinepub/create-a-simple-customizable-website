@@ -1,58 +1,37 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Frontend: Draft/Live publish flow wiring",
+  "title": "Fix frontend build/deploy blockers and improve deploy-time diagnostics",
   "requirements": [
     {
       "id": "REQ-3",
-      "summary": "Render Live website content on the public site by default.",
+      "summary": "Remove frontend compilation blockers and improve runtime error visibility so standard build/deploy completes cleanly and failures are actionable.",
       "acceptanceCriteria": [
-        "On a fresh page load, the main site UI (header, hero, main section, footer) displays the Live content.",
-        "No draft-only edits appear on the public site until a publish action is performed."
+        "Running the standard build produces no Motoko compilation errors for the backend canister.",
+        "Running the standard build produces no TypeScript/Vite compilation errors for the frontend.",
+        "A full deploy completes successfully (backend + frontend) without runtime traps during initialization.",
+        "If the deployment fails again, surface the exact failing step and error output in logs so it is actionable to fix."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/backend.d.ts",
           "operation": "modify",
-          "description": "Update the public content query hook(s) to fetch Live content via the backend's Live-read capability (e.g., use getLiveContent) and use a distinct React Query key for Live content so it can be invalidated/refetched independently."
+          "description": "Align TypeScript declarations with the actor methods used by the frontend by adding the missing access-control initialization function used in frontend/src/hooks/useActor.ts (e.g., declare the secret-based initialization method on backendInterface). This prevents TypeScript/Vite compilation failures caused by calling an undeclared backend capability."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Wire the main site render path (HeaderNav, HeroSection, ContentSections, Footer) to consume the Live-content query hook (not Draft), ensuring the default public view reflects only Live content."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Update the editor to edit Draft content and add an explicit Publish action that promotes Draft to Live with clear confirmation and feedback.",
-      "acceptanceCriteria": [
-        "The editor loads Draft content into its form fields (not Live).",
-        "Saving from the editor updates Draft only.",
-        "The editor includes a distinct “Publish” button that calls the backend publish operation.",
-        "After publishing, the public site reflects the newly published content (Live) without requiring a hard refresh (React Query cache invalidation/refetch is sufficient).",
-        "User-facing messages for save/publish success/failure are in English and clearly distinguish between saving a draft and publishing live."
-      ],
-      "file_operations": [
+          "description": "Eliminate any brittle/incorrect UI import paths that can break Vite/TypeScript builds (e.g., prefer importing Toaster from the installed 'sonner' package rather than relying on an alias-based '@/components/ui/sonner' shim). Keep user-facing text in English."
+        },
         {
-          "path": "frontend/src/hooks/useAnonymousWebsiteContent.ts",
+          "path": "frontend/src/components/common/LiveContentErrorState.tsx",
           "operation": "modify",
-          "description": "Switch the anonymous editor hooks to read Draft content and update Draft content via the backend's draft capabilities (e.g., getDraftContent/updateDraftContent). Introduce a dedicated publish mutation (e.g., publishDraft) that invalidates/refetches both the Draft and Live React Query caches so the public site updates immediately after publishing."
+          "description": "Improve error surfacing to make failures actionable by logging a structured error (message + stack + any available cause) to the console and presenting a clearer error summary for users while keeping all user-facing text in English."
         },
         {
           "path": "frontend/src/components/admin/AdminEditor.tsx",
           "operation": "modify",
-          "description": "Update the editor UI to: (1) load Draft content into fields, (2) rename/clarify save action as saving a draft (English messaging), (3) add a distinct “Publish” button that triggers the publish mutation, shows a confirmation step, and displays success/failure feedback that clearly distinguishes draft-save vs live-publish. Use shadcn-ui dialog/alert components (e.g., AlertDialog) where appropriate for confirmation/feedback; Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Ensure React Query keys and invalidation logic support cross-surface refresh: when publish succeeds (triggered from anonymous editor hooks), the Live-content query used by the public site can be invalidated/refetched to reflect newly published content without a hard refresh."
-        },
-        {
-          "path": "frontend/src/components/navigation/HeaderNav.tsx",
-          "operation": "modify",
-          "description": "Update editor entry-point labeling (e.g., “Edit Draft” and/or tooltip/helper text) to make it clear the editor changes are draft-only until published, using clear English UI text."
+          "description": "Harden editor error handling so draft load/save/publish failures provide actionable diagnostics in logs (console) without changing features (e.g., include underlying error message details where safe). Ensure generated image choices remain valid and reference existing public assets (frontend/public/assets/generated/hero-illustration.dim_1600x900.png, frontend/public/assets/generated/hero-illustration-alt-1.dim_1600x900.png, frontend/public/assets/generated/hero-illustration-alt-2.dim_1600x900.png, frontend/public/assets/generated/hero-illustration-alt-3.dim_1600x900.png). Verify the component's usage instructions before implementing."
         }
       ]
     }

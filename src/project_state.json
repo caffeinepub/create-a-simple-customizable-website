@@ -2,54 +2,23 @@
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
   "summary": "New project",
-  "architectural_notes": [
-    "Support a deployment workflow that promotes a draft version to live/production."
+  "architectural_notes": [],
+  "known_issues": [
+    "Deployment failed; user requested a retry of the build/deployment."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-update-the-frontend-so-the-public-site-renders-the-live-website-content-by-default-not-the-draft-content",
-      "title": "Update the frontend so the public site renders the Live website content by default (not the Draft content).",
+      "id": "feature-identify-and-fix-the-cause-of-the-failed-deployment-ensuring-the-project-builds-and-deploys-successfully-using-the-standard-internet-computer-workflow-backend-canister-frontend-assets",
+      "title": "Identify and fix the cause of the failed deployment, ensuring the project builds and deploys successfully using the standard Internet Computer workflow (backend canister + frontend assets).",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-update-the-editor-flow-so-it-edits-draft-content-and-provides-an-explicit-publish-action-that-promotes-draft-to-live-with-clear-english-ui-text-and-confirmation-feedback",
-      "title": "Update the editor flow so it edits Draft content and provides an explicit “Publish” action that promotes Draft to Live, with clear English UI text and confirmation feedback.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Add a publish flow to promote a draft build to live/production",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Add backend support for separate Draft and Live website content states, including APIs to read Live content, read Draft content, update Draft content, and publish Draft to Live.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Implement a conditional Motoko state migration to preserve existing single-version website content by initializing both Draft and Live content from the current stored content on upgrade.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    }
-  ],
-  "projectName": "Add publish flow to promote draft website content to live",
+  "new_feature_requests": [],
+  "projectName": "Retry deployment by fixing build/deploy failure and ensuring clean dfx deploy",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -2,8 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAnonymousActor } from './useAnonymousActor';
 import type { WebsiteContent } from '../backend';
 
-// Editor loads Draft content
-export function useGetDraftContent() {
+// Editor loads Draft content - only when editor is open
+export function useGetDraftContent(isEditorOpen: boolean) {
   const { actor, isFetching } = useAnonymousActor();
 
   return useQuery<WebsiteContent>({
@@ -12,7 +12,7 @@ export function useGetDraftContent() {
       if (!actor) throw new Error('Actor not available');
       return actor.getDraftContent();
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !isFetching && isEditorOpen,
     retry: 2,
     retryDelay: 1000,
   });

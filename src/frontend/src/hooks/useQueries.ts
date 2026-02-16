@@ -13,6 +13,8 @@ export function useGetLiveContent() {
       return actor.getLiveContent();
     },
     enabled: !!actor && !isFetching,
+    retry: 2,
+    retryDelay: 1000,
   });
 }
 
