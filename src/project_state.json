@@ -3,22 +3,28 @@
   "projectStateVersion": 3,
   "summary": "New project",
   "architectural_notes": [],
-  "known_issues": [
-    "Deployment failed; user requested a retry of the build/deployment."
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-identify-and-fix-the-cause-of-the-failed-deployment-ensuring-the-project-builds-and-deploys-successfully-using-the-standard-internet-computer-workflow-backend-canister-frontend-assets",
-      "title": "Identify and fix the cause of the failed deployment, ensuring the project builds and deploys successfully using the standard Internet Computer workflow (backend canister + frontend assets).",
+      "id": "feature-ensure-the-in-app-editor-can-successfully-load-edit-and-save-draft-website-content-by-using-an-authenticated-backend-actor-internet-identity-for-admin-only-draft-apis-instead-of-an-anonymous-actor",
+      "title": "Ensure the in-app editor can successfully load, edit, and save draft website content by using an authenticated backend actor (Internet Identity) for admin-only draft APIs instead of an anonymous actor.",
       "reqIds": [
-        "REQ-3"
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-if-a-non-authenticated-or-non-admin-user-attempts-to-open-the-editor-show-a-clear-access-authorization-message-and-a-path-to-resolve-it-sign-in-with-internet-identity-and-or-provide-the-admin-secret-token-via-the-existing-url-parameter-mechanism-rather-than-a-generic-load-failure",
+      "title": "If a non-authenticated or non-admin user attempts to open the editor, show a clear access/authorization message and a path to resolve it (sign in with Internet Identity and/or provide the admin secret token via the existing URL parameter mechanism) rather than a generic load failure.",
+      "reqIds": [
+        "REQ-2"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [],
-  "projectName": "Retry deployment by fixing build/deploy failure and ensuring clean dfx deploy",
+  "projectName": "Waxy Publisher",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

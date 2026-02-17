@@ -77,29 +77,38 @@ actor {
     footerText = "Built with WAXY on the Internet Computer.";
   };
 
-  // Draft content is now public
+  // Draft content starts as copy of live content
   var draftContent : WebsiteContent = liveContent;
   var userProfiles = Map.empty<Principal, UserProfile>();
 
   // Website Content Management APIs
 
   public query ({ caller }) func getLiveContent() : async WebsiteContent {
-    // Public access - no authorization check needed
+    // Public access - anyone can view live content
     liveContent;
   };
 
   public query ({ caller }) func getDraftContent() : async WebsiteContent {
-    // Now public access - no admin check needed
+    // Admin-only: Draft content is work-in-progress and should not be publicly visible
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view draft content");
+    };
     draftContent;
   };
 
   public shared ({ caller }) func updateDraftContent(newContent : WebsiteContent) : async () {
-    // Publicly accessible - no admin check needed
+    // Admin-only: Only admins can modify draft content
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update draft content");
+    };
     draftContent := newContent;
   };
 
   public shared ({ caller }) func publishDraft() : async () {
-    // Publish action is now public - no admin check needed
+    // Admin-only: Only admins can publish content to the live site
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can publish content");
+    };
     liveContent := draftContent;
   };
 

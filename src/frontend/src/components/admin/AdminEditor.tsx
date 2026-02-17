@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGetDraftContent, useUpdateDraftContent, usePublishDraft } from '../../hooks/useAnonymousWebsiteContent';
+import { useInternetIdentity } from '../../hooks/useInternetIdentity';
+import { useActor } from '../../hooks/useActor';
 import HeroSection from '../sections/HeroSection';
+import AccessDeniedScreen from './AccessDeniedScreen';
 import type { Alignment } from '../../backend';
 import { Variant_top_middle_bottom } from '../../backend';
 import {
@@ -28,7 +31,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, Save, Eye, Edit, RefreshCw, Rocket } from 'lucide-react';
+import { AlertCircle, Save, Eye, Edit, RefreshCw, Rocket, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AdminEditorProps {
@@ -44,12 +47,16 @@ const AVAILABLE_IMAGES = [
 ];
 
 export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
+  const { identity, loginStatus } = useInternetIdentity();
+  const { actor, isFetching: actorFetching } = useActor();
   const { data: content, isLoading: contentLoading, error: contentError, refetch } = useGetDraftContent(isOpen);
   const { mutate: updateDraft, isPending: isSaving, error: saveError, isSuccess: saveSuccess, reset: resetSaveMutation } = useUpdateDraftContent();
   const { mutate: publishDraft, isPending: isPublishing, error: publishError, isSuccess: publishSuccess, reset: resetPublishMutation } = usePublishDraft();
 
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
   const [showPublishConfirm, setShowPublishConfirm] = useState(false);
+  const [showPublishSuccess, setShowPublishSuccess] = useState(false);
+  const [showPublishError, setShowPublishError] = useState(false);
   const [formData, setFormData] = useState({
     siteTitle: '',
     heroTitle: '',
@@ -66,6 +73,13 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
     mainBody: '',
     footerText: '',
   });
+
+  const isAuthenticated = !!identity;
+  const isInitializing = loginStatus === 'initializing' || actorFetching;
+
+  // Detect authorization errors (Unauthorized trap from backend)
+  const isUnauthorizedError = contentError instanceof Error && 
+    contentError.message.includes('Unauthorized');
 
   useEffect(() => {
     if (content) {
@@ -97,13 +111,16 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
 
   useEffect(() => {
     if (publishSuccess) {
-      toast.success('Changes published live!', {
-        description: 'Your website has been updated and is now visible to all visitors.',
-      });
+      setShowPublishSuccess(true);
       resetPublishMutation();
-      handleClose();
     }
   }, [publishSuccess, resetPublishMutation]);
+
+  useEffect(() => {
+    if (publishError) {
+      setShowPublishError(true);
+    }
+  }, [publishError]);
 
   // Log errors for debugging
   useEffect(() => {
@@ -139,6 +156,8 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
   const handleClose = () => {
     resetSaveMutation();
     resetPublishMutation();
+    setShowPublishSuccess(false);
+    setShowPublishError(false);
     onClose();
   };
 
@@ -180,15 +199,32 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
   };
 
   const handlePublishConfirm = () => {
-    publishDraft();
     setShowPublishConfirm(false);
+    publishDraft();
+  };
+
+  const handlePublishSuccessClose = () => {
+    setShowPublishSuccess(false);
+    handleClose();
+  };
+
+  const handlePublishErrorRetry = () => {
+    setShowPublishError(false);
+    resetPublishMutation();
+    publishDraft();
+  };
+
+  const handlePublishErrorClose = () => {
+    setShowPublishError(false);
+    resetPublishMutation();
   };
 
   const handleRetry = () => {
     refetch();
   };
 
-  if (contentLoading) {
+  // Show loading state while initializing
+  if (isInitializing || contentLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-2xl">
@@ -203,6 +239,41 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
     );
   }
 
+  // Show authentication required screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editor Access</DialogTitle>
+            <DialogDescription>
+              Sign in to access the website editor.
+            </DialogDescription>
+          </DialogHeader>
+          <AccessDeniedScreen variant="unauthenticated" onClose={handleClose} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Show authorization denied screen if authenticated but unauthorized
+  if (isUnauthorizedError) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editor Access</DialogTitle>
+            <DialogDescription>
+              Admin permissions are required to access the website editor.
+            </DialogDescription>
+          </DialogHeader>
+          <AccessDeniedScreen variant="unauthorized" onClose={handleClose} />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Show generic error for non-auth-related failures
   if (contentError) {
     const errorMessage = contentError instanceof Error 
       ? contentError.message 
@@ -260,15 +331,6 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 Failed to save draft: {saveError instanceof Error ? saveError.message : 'Please try again.'}
-              </AlertDescription>
-            </Alert>
-          )}
-
-          {publishError && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Failed to publish changes: {publishError instanceof Error ? publishError.message : 'Please try again.'}
               </AlertDescription>
             </Alert>
           )}
@@ -542,35 +604,17 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
                       Cancel
                     </Button>
                     <Button type="submit" disabled={isSaving} className="gap-2">
-                      {isSaving ? (
-                        <>
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4" />
-                          Save Draft
-                        </>
-                      )}
+                      <Save className="h-4 w-4" />
+                      {isSaving ? 'Saving...' : 'Save Draft'}
                     </Button>
                     <Button 
                       type="button" 
                       onClick={handlePublishClick}
                       disabled={isPublishing}
-                      className="gap-2 bg-green-600 hover:bg-green-700"
+                      className="gap-2"
                     >
-                      {isPublishing ? (
-                        <>
-                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
-                          Publishing...
-                        </>
-                      ) : (
-                        <>
-                          <Rocket className="h-4 w-4" />
-                          Publish Live
-                        </>
-                      )}
+                      <Rocket className="h-4 w-4" />
+                      {isPublishing ? 'Publishing...' : 'Publish Live'}
                     </Button>
                   </div>
                 </form>
@@ -580,42 +624,35 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
             <TabsContent value="preview" className="flex-1 overflow-hidden mt-4">
               <ScrollArea className="h-[calc(95vh-220px)]">
                 <div className="space-y-8 pb-8">
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <h3 className="text-sm font-medium text-muted-foreground mb-4">Hero Section Preview</h3>
-                    <div className="bg-background rounded border">
-                      <HeroSection
-                        title={formData.heroTitle}
-                        body={formData.heroBody}
-                        imageSrc={previewImageSrc}
-                        titlePosition={{
-                          horizontal: formData.titleHorizontal,
-                          vertical: formData.titleVertical,
-                        }}
-                        bodyPosition={{
-                          horizontal: formData.bodyHorizontal,
-                          vertical: formData.bodyVertical,
-                        }}
-                        imagePosition={{
-                          horizontal: formData.imageHorizontal,
-                          vertical: formData.imageVertical,
-                        }}
-                        isPreview
-                      />
-                    </div>
-                  </div>
-
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <h3 className="text-sm font-medium text-muted-foreground mb-4">Main Section Preview</h3>
-                    <div className="bg-background rounded border p-8">
+                  <HeroSection
+                    title={formData.heroTitle}
+                    body={formData.heroBody}
+                    imageSrc={previewImageSrc}
+                    titlePosition={{
+                      horizontal: formData.titleHorizontal,
+                      vertical: formData.titleVertical,
+                    }}
+                    bodyPosition={{
+                      horizontal: formData.bodyHorizontal,
+                      vertical: formData.bodyVertical,
+                    }}
+                    imagePosition={{
+                      horizontal: formData.imageHorizontal,
+                      vertical: formData.imageVertical,
+                    }}
+                    isPreview
+                  />
+                  
+                  <div className="px-4">
+                    <div className="max-w-4xl mx-auto">
                       <h2 className="text-3xl font-bold mb-4">{formData.mainTitle}</h2>
-                      <p className="text-muted-foreground">{formData.mainBody}</p>
+                      <p className="text-lg text-muted-foreground">{formData.mainBody}</p>
                     </div>
                   </div>
 
-                  <div className="bg-muted/30 rounded-lg p-4">
-                    <h3 className="text-sm font-medium text-muted-foreground mb-4">Footer Preview</h3>
-                    <div className="bg-background rounded border p-6 text-center">
-                      <p className="text-sm text-muted-foreground">{formData.footerText}</p>
+                  <div className="px-4 py-8 border-t">
+                    <div className="max-w-4xl mx-auto text-center text-sm text-muted-foreground">
+                      {formData.footerText}
                     </div>
                   </div>
                 </div>
@@ -625,18 +662,69 @@ export default function AdminEditor({ isOpen, onClose }: AdminEditorProps) {
         </DialogContent>
       </Dialog>
 
+      {/* Publish Confirmation Dialog */}
       <AlertDialog open={showPublishConfirm} onOpenChange={setShowPublishConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Publish Changes Live?</AlertDialogTitle>
+            <AlertDialogTitle>Publish to Live Site?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will make your draft changes visible to all visitors immediately. Make sure you've saved your draft first.
+              This will make your draft content visible to all visitors. Your current live content will be replaced.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handlePublishConfirm} className="bg-green-600 hover:bg-green-700">
+            <AlertDialogAction onClick={handlePublishConfirm}>
               Publish Now
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Publish Success Dialog */}
+      <AlertDialog open={showPublishSuccess} onOpenChange={setShowPublishSuccess}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <AlertDialogTitle>Published Successfully!</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription>
+              Your changes are now live and visible to all visitors.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handlePublishSuccessClose}>
+              Close Editor
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Publish Error Dialog */}
+      <AlertDialog open={showPublishError} onOpenChange={setShowPublishError}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <AlertDialogTitle>Publish Failed</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription>
+              {publishError instanceof Error 
+                ? publishError.message 
+                : 'An error occurred while publishing your content. Please try again.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handlePublishErrorClose}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handlePublishErrorRetry}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Try Again
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

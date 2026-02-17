@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAnonymousActor } from './useAnonymousActor';
+import { useActor } from './useActor';
 import type { WebsiteContent } from '../backend';
 
 // Editor loads Draft content - only when editor is open
+// Now uses authenticated actor for admin-only draft operations
 export function useGetDraftContent(isEditorOpen: boolean) {
-  const { actor, isFetching } = useAnonymousActor();
+  const { actor, isFetching } = useActor();
 
   return useQuery<WebsiteContent>({
     queryKey: ['draftContent'],
@@ -19,8 +20,9 @@ export function useGetDraftContent(isEditorOpen: boolean) {
 }
 
 // Editor updates Draft content only
+// Now uses authenticated actor for admin-only draft operations
 export function useUpdateDraftContent() {
-  const { actor } = useAnonymousActor();
+  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -36,8 +38,9 @@ export function useUpdateDraftContent() {
 }
 
 // Publish Draft to Live
+// Now uses authenticated actor for admin-only publish operation
 export function usePublishDraft() {
-  const { actor } = useAnonymousActor();
+  const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -45,10 +48,12 @@ export function usePublishDraft() {
       if (!actor) throw new Error('Actor not available');
       return actor.publishDraft();
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Invalidate both Draft and Live content so public site updates
-      queryClient.invalidateQueries({ queryKey: ['draftContent'] });
-      queryClient.invalidateQueries({ queryKey: ['liveContent'] });
+      await queryClient.invalidateQueries({ queryKey: ['draftContent'] });
+      await queryClient.invalidateQueries({ queryKey: ['liveContent'] });
+      // Explicitly refetch live content to guarantee immediate update
+      await queryClient.refetchQueries({ queryKey: ['liveContent'] });
     },
   });
 }

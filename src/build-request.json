@@ -1,43 +1,68 @@
 {
   "kind": "build_request",
-  "title": "Retry deployment by fixing build/deploy failure and ensuring clean dfx deploy",
-  "priority": "high",
+  "title": "Fix admin editor so users can edit draft content",
+  "projectName": "Waxy Publisher",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-3",
-      "text": "Identify and fix the cause of the failed deployment, ensuring the project builds and deploys successfully using the standard Internet Computer workflow (backend canister + frontend assets).",
-      "target": "both",
+      "id": "REQ-1",
+      "text": "Ensure the in-app editor can successfully load, edit, and save draft website content by using an authenticated backend actor (Internet Identity) for admin-only draft APIs instead of an anonymous actor.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-2",
-          "msg-3"
+          "msg-4"
         ],
         "quotes": [
-          "deployment failed",
-          "Retry"
+          "I need to edit it"
         ]
       },
       "acceptanceCriteria": [
-        "Running the standard build produces no Motoko compilation errors for the backend canister.",
-        "Running the standard build produces no TypeScript/Vite compilation errors for the frontend.",
-        "A full deploy completes successfully (backend + frontend) without runtime traps during initialization.",
-        "If the deployment fails again, surface the exact failing step and error output in logs so it is actionable to fix."
+        "When a signed-in admin opens the editor, draft content loads without an Unauthorized trap.",
+        "Saving updates the draft content and shows a clear success confirmation.",
+        "Publishing still works and refreshes the live site content after success (no content edits required to publish)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "If a non-authenticated or non-admin user attempts to open the editor, show a clear access/authorization message and a path to resolve it (sign in with Internet Identity and/or provide the admin secret token via the existing URL parameter mechanism) rather than a generic load failure.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "I need to edit it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Opening the editor while not signed in prompts the user to sign in (or otherwise clearly indicates authentication is required).",
+        "Opening the editor while signed in but lacking admin permission shows an explicit authorization/access-denied message (not a generic 'Unable to Load Editor').",
+        "All user-facing text is in English."
       ]
     }
   ],
   "constraints": [
-    "Keep all Motoko logic in the single main actor (backend/main.mo).",
-    "Do not edit frontend files in immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Use English for any user-facing text."
+    "Do not edit files under frontend/src/components/ui (compose them only).",
+    "Do not edit any paths listed in frontend.immutablePaths (treat them as read-only).",
+    "Keep all backend logic in the single Motoko actor at backend/main.mo; add migration.mo only if persistent state changes are required."
   ],
   "nonGoals": [
-    "Adding new product features unrelated to fixing the deployment failure.",
-    "Changing authentication providers beyond Internet Identity.",
-    "Introducing external databases or services."
+    "Adding new authentication providers beyond Internet Identity.",
+    "Adding real-time collaboration or multi-user editing.",
+    "Introducing external databases or backend services."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

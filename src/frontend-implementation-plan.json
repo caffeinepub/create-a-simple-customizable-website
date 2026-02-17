@@ -1,37 +1,47 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix frontend build/deploy blockers and improve deploy-time diagnostics",
+  "title": "Fix admin editor authentication and access messaging for draft editing",
   "requirements": [
     {
-      "id": "REQ-3",
-      "summary": "Remove frontend compilation blockers and improve runtime error visibility so standard build/deploy completes cleanly and failures are actionable.",
+      "id": "REQ-1",
+      "summary": "Switch the admin editor draft load/save/publish flows to use an authenticated backend actor (Internet Identity) for admin-only draft capabilities, with clear save success feedback and live refresh after publish.",
       "acceptanceCriteria": [
-        "Running the standard build produces no Motoko compilation errors for the backend canister.",
-        "Running the standard build produces no TypeScript/Vite compilation errors for the frontend.",
-        "A full deploy completes successfully (backend + frontend) without runtime traps during initialization.",
-        "If the deployment fails again, surface the exact failing step and error output in logs so it is actionable to fix."
+        "When a signed-in admin opens the editor, draft content loads without an Unauthorized trap.",
+        "Saving updates the draft content and shows a clear success confirmation.",
+        "Publishing still works and refreshes the live site content after success (no content edits required to publish)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/backend.d.ts",
+          "path": "frontend/src/hooks/useAnonymousWebsiteContent.ts",
           "operation": "modify",
-          "description": "Align TypeScript declarations with the actor methods used by the frontend by adding the missing access-control initialization function used in frontend/src/hooks/useActor.ts (e.g., declare the secret-based initialization method on backendInterface). This prevents TypeScript/Vite compilation failures caused by calling an undeclared backend capability."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Eliminate any brittle/incorrect UI import paths that can break Vite/TypeScript builds (e.g., prefer importing Toaster from the installed 'sonner' package rather than relying on an alias-based '@/components/ui/sonner' shim). Keep user-facing text in English."
-        },
-        {
-          "path": "frontend/src/components/common/LiveContentErrorState.tsx",
-          "operation": "modify",
-          "description": "Improve error surfacing to make failures actionable by logging a structured error (message + stack + any available cause) to the console and presenting a clearer error summary for users while keeping all user-facing text in English."
+          "description": "Refactor draft-content hooks to call draft admin-only backend capabilities via the authenticated actor from useActor (instead of the anonymous actor), including keeping the existing React Query invalidation/refetch behavior so publish refreshes live content. Verify the selected component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/components/admin/AdminEditor.tsx",
           "operation": "modify",
-          "description": "Harden editor error handling so draft load/save/publish failures provide actionable diagnostics in logs (console) without changing features (e.g., include underlying error message details where safe). Ensure generated image choices remain valid and reference existing public assets (frontend/public/assets/generated/hero-illustration.dim_1600x900.png, frontend/public/assets/generated/hero-illustration-alt-1.dim_1600x900.png, frontend/public/assets/generated/hero-illustration-alt-2.dim_1600x900.png, frontend/public/assets/generated/hero-illustration-alt-3.dim_1600x900.png). Verify the component's usage instructions before implementing."
+          "description": "Update AdminEditor to use the authenticated-actor draft hooks for loading, saving, and publishing draft content (replacing the anonymous-actor draft hooks), preserving existing save success confirmation and publish success handling. Verify the selected component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Provide explicit editor access messaging for unauthenticated and non-admin users, including guidance to sign in with Internet Identity and/or supply the admin secret token via the existing URL-parameter mechanism.",
+      "acceptanceCriteria": [
+        "Opening the editor while not signed in prompts the user to sign in (or otherwise clearly indicates authentication is required).",
+        "Opening the editor while signed in but lacking admin permission shows an explicit authorization/access-denied message (not a generic 'Unable to Load Editor').",
+        "All user-facing text is in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/AccessDeniedScreen.tsx",
+          "operation": "modify",
+          "description": "Expand AccessDeniedScreen into a reusable access/authorization message UI that can render (a) an authentication-required message with an embedded Internet Identity sign-in action (compose existing LoginButton), and (b) an access-denied message with instructions to provide the admin secret token using the existing caffeineAdminToken URL hash parameter mechanism; keep all text English. Verify the selected component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/admin/AdminEditor.tsx",
+          "operation": "modify",
+          "description": "Detect unauthenticated vs. unauthorized (non-admin) conditions before/while attempting draft load (using Internet Identity state plus existing admin checks) and render the updated AccessDeniedScreen instead of the current generic load-failure dialog for these cases; keep generic error UI only for non-auth-related failures. Verify the selected component's usage instructions before implementing."
         }
       ]
     }
